@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactDOM} from 'react';
 import {Form, Segment, Container} from 'semantic-ui-react'
 import {DIVISIONS} from '../utils/constants'
 
@@ -14,6 +14,8 @@ export default (props) => {
         <p>Register your team today</p>
       </Segment>
       <Segment basic>
+        <div id="registrationForm">
+        </div>
         <Form data-netlify="true"> 
           <Form.Input required label="Team" name="team"/>
           <Form.Input required label="Email" name="email"/>
@@ -23,6 +25,7 @@ export default (props) => {
             options={divisions}
             placeholder="Choose division"/
           > 
+          <input type="hidden" name="form-name" value="registration"/>
           <Form.Button>Register</Form.Button>
         </Form>
       </Segment>
