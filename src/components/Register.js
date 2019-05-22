@@ -14,7 +14,7 @@ export default (props) => {
         <p>Register your team today</p>
       </Segment>
       <Segment basic>
-        <Form netlify="true"> 
+        <Form data-netlify="true"> 
           <Form.Input required label="Team" name="team"/>
           <Form.Input required label="Email" name="email"/>
           <Form.Dropdown required 
