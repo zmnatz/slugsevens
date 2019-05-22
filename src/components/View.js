@@ -1,7 +1,7 @@
 import React from 'react';
 import {Tab, Segment} from 'semantic-ui-react';
 
-import Schedule from './Schedule';
+// import Schedule from './Schedule';
 import {TeamList} from './Teams';
 import Register from './Register';
 
@@ -11,7 +11,7 @@ export default ({teams, games, settings}) => <Segment>
   <Tab panes={[
     {
       menuItem: 'Register',
-      render: Register
+      render: () => <Register/>
     },
     {
       menuItem: 'Schedule',

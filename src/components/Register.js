@@ -1,7 +1,8 @@
-import React from "react";
+import React, {useCallback, useState} from "react";
 import { Form, Segment, Container } from "semantic-ui-react";
 import { DIVISIONS } from "../utils/constants";
-import useFirebase from "../hooks/useFirebase";
+// import useFirebase from "../hooks/useFirebase";
+import firebase from '../api/fire'
 
 const divisions = DIVISIONS.map(division => ({
   value: division,
@@ -9,12 +10,20 @@ const divisions = DIVISIONS.map(division => ({
 }));
 
 const Register = (props) => {
-  const [form, setForm] = React.useState({})
+  const [form, setForm] = useState({
+    email: '',
+    division: '',
+    team: ''
+  })
+  // const {addData} = useFirebase('registration')
 
   const onSubmit=useCallback((e) => {
     e.preventDefault();
-    console.log(form)
+    firebase.database().ref('registration').push(form).then(
+      () => console.log('success')
+    )
   }, [form])
+
   const onChange= useCallback((e, {name, value}) => {
     setForm(prev => ({
       ...prev,
