@@ -1,11 +1,12 @@
-import React, {useCallback} from 'react';
-import {Form, Segment, Container} from 'semantic-ui-react'
-import {DIVISIONS} from '../utils/constants'
+import React from "react";
+import { Form, Segment, Container } from "semantic-ui-react";
+import { DIVISIONS } from "../utils/constants";
+import useFirebase from "../hooks/useFirebase";
 
 const divisions = DIVISIONS.map(division => ({
   value: division,
   text: division
-}))
+}));
 
 const Register = (props) => {
   const [form, setForm] = React.useState({})
