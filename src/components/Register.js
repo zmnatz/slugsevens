@@ -16,17 +16,18 @@ export default (props) => {
       <Segment basic>
         <div id="registrationForm">
         </div>
-        <Form data-netlify="true"> 
+        <Form method="post"> 
           <Form.Input required label="Team" name="team"/>
           <Form.Input required label="Email" name="email"/>
           <Form.Dropdown required 
             label="Division"
+            name="division"
             fluid selection
             options={divisions}
             placeholder="Choose division"/
           > 
           <input type="hidden" name="form-name" value="registration"/>
-          <Form.Button>Register</Form.Button>
+          <Form.Button type="submit">Register</Form.Button>
         </Form>
       </Segment>
     </Segment>
