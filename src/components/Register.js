@@ -16,7 +16,7 @@ export default (props) => {
       <Segment basic>
         <div id="registrationForm">
         </div>
-        <Form method="post"> 
+        <Form method="post" name="registration">  
           <Form.Input required label="Team" name="team"/>
           <Form.Input required label="Email" name="email"/>
           <Form.Dropdown required 
