@@ -6,6 +6,7 @@ import { DEFAULT_SCHEDULE } from "./components/ScheduleSettings";
 import { SCORE_DEFAULTS, determineOutcomes, reverseOutcome } from "./utils";
 import Admin from "./components/Admin";
 import View from "./components/View";
+import Registrations from './components/Registrations'
 
 class App extends Component {
   state = {
@@ -119,6 +120,7 @@ class App extends Component {
           settings={settings}
           masterMode
         />
+        <Registrations path="/registrations"/>
         <View default teams={teams} games={games} settings={settings} />
       </Router>
     );
