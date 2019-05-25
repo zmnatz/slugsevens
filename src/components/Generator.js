@@ -65,7 +65,7 @@ export default class Generator extends Component {
       }
       return {
         ...game,
-        field: index % numFields,
+        field: (index % numFields) + 1,
         time
       }
     })
