@@ -1,91 +1,61 @@
-import React, { Component } from 'react';
-import { Card, Segment, Menu, Sidebar, Button } from 'semantic-ui-react'
+import React, { useCallback, useMemo, useState } from 'react';
+import { Card, Segment, Sidebar } from 'semantic-ui-react'
 
-import Game from './Game';
+import TeamList from './TeamList'
+import FilterMenu from './FilterMenu'
+import Game from 'components/Game';
 
-const FilterMenu = ({ filter, onToggle, visible, onSelect }) =>
-  <div>
-    <Button basic color="blue"
-      icon={visible ? "delete" : "bars"}
-      content={visible ? "Close Filter" : "Filter Teams"}
-      onClick={onToggle}
-    />
-    {filter ?
-      <Button basic color="red" icon="delete" content={filter}
-        onClick={onSelect} />
-      : ''
-    }
-  </div>
+import useQuery from 'hooks/useQuery';
 
-const TeamMenu = ({ teams, visible, onSelect }) => {
-  const sortedTeams = [...teams];
-  sortedTeams.sort(({name = ''}, {name:other=''}) => name.localeCompare(other))
-  return <Sidebar as={Menu}
-    visible={visible}
-    animation='push'
-    vertical
-    inverted
-  >
-    <Menu.Item as='a' onClick={onSelect.bind(this, false)}>
-      All Teams
-    </Menu.Item>
-    {teams.map(team =>
-      <Menu.Item key={team.name} as='a' content={team.name}
-        onClick={onSelect.bind(this, team.id)} />
-    )}
-  </Sidebar>
-}
+export default (props) => {
+  const [sidebar, setSidebar] = useState(false);
+  const [selected, setSelected] = useState();
+  const games = useQuery('games');
+  
+  const toggleSidebar = useCallback(
+    () => setSidebar(prev => !prev),
+    [setSidebar]
+  )
 
-export default class Schedule extends Component {
-  state = {
-    sidebar: false,
-    selected: false
-  }
+  const clearSelected = useCallback(() => setSelected(null), [setSelected])
 
-  _handleSidebar = () =>
-    this.setState(prev => ({ sidebar: !prev.sidebar }))
-  _handleSelect = (team) =>
-    this.setState({ selected: team })
-
-  render() {
-    const { games, readOnly, teams, editable, masterMode } = this.props,
-      { selected } = this.state,
-      filteredGames = games.filter(game =>
-        game != null && (
-          !selected ||
-          game.home.id === selected ||
-          game.away.id === selected
-        )
-      )
-    filteredGames.sort((a, b) => {
+  const filteredGames = useMemo(
+    () => games.filter(game => game != null && (
+      selected == null || game.home.id === selected || game.away.id === selected
+    )).sort((a, b) => {
       return (a.time + a.field).localeCompare(b.time + b.field)
-    })
-    return <Segment basic loading={games.length < 1}>
-      <FilterMenu filter={!selected ? false : teams.find(team => team.id === selected).name}
-        visible={this.state.sidebar}
-        onToggle={this._handleSidebar}
-        onSelect={this._handleSelect.bind(this, false)}
-      />
+    }),
+    [games, selected]
+  )
+
+  const scores = useMemo(
+    () => <Card.Group>
+      {filteredGames.map((game, index) => 
+        <Game key={index}
+          readOnly={props.readOnly}
+          editMode={props.masterMode}
+          game={game}
+          field={game.field}
+          editable={props.editable}
+        />
+      )}
+    </Card.Group>,
+    [filteredGames, props]
+  )
+
+  return useMemo(() => (
+    <Segment basic loading={games.length < 1}>
+      <FilterMenu filter={selected} visible={sidebar}
+        onToggle={toggleSidebar} clearSelected={clearSelected}/>
       <Sidebar.Pushable as={Segment}>
-        <TeamMenu teams={teams} visible={this.state.sidebar}
-          onSelect={this._handleSelect} />
+        <TeamList visible={sidebar} onSelect={setSelected} />
 
         <Sidebar.Pusher>
           <Segment.Group style={{ minHeight: 300 }}>
-            <Card.Group>
-              {filteredGames.map((game) =>
-                <Game key={game.id}
-                  readOnly={readOnly}
-                  editMode={masterMode}
-                  game={game}
-                  field={game.field}
-                  editable={editable}
-                />
-              )}
-            </Card.Group>
+            {scores}
           </Segment.Group>
         </Sidebar.Pusher>
       </Sidebar.Pushable>
     </Segment>
-  }
+  ),[scores, sidebar, selected, clearSelected, toggleSidebar, games])
 }

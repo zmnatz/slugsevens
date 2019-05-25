@@ -6,13 +6,12 @@ import Teams from './Teams';
 
 import { DIVISIONS } from '../utils/constants'
 
-export default ({ teams, games, settings, masterMode }) => <Segment>
+export default ({ teams, games, masterMode }) => <Segment>
   <Tab panes={[
     {
       menuItem: 'Schedule',
       render: () =>
         <Schedule games={games} teams={teams}
-          settings={settings}
           editable
           masterMode={masterMode}
         />

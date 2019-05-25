@@ -111,7 +111,7 @@ export default class Game extends Component {
       <Card>
         <Card.Content>
           <Card.Header>
-            Field {field + 2} - {game.time}
+            Field {field} - {game.time}
           </Card.Header>
           <Card.Description>
             {game.complete || readOnly ? (
@@ -129,7 +129,7 @@ export default class Game extends Component {
                     />
                     <Form.Input
                       type="number"
-                      value={game.field + 2}
+                      value={game.field}
                       label="Field"
                       onChange={this._handleFieldChange}
                       onFocus={handleFocus}

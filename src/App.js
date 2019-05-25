@@ -2,18 +2,17 @@ import React, { Component } from "react";
 import { Router } from "@reach/router";
 import fire from "./api/fire";
 import "semantic-ui-css/semantic.min.css";
-import { DEFAULT_SCHEDULE } from "./components/ScheduleSettings";
 import { SCORE_DEFAULTS, determineOutcomes, reverseOutcome } from "./utils";
 import Admin from "./components/Admin";
 import View from "./components/View";
 import Registrations from './components/Registrations'
+import Generator from './components/Generator'
 
 class App extends Component {
   state = {
     teams: [],
     games: [],
-    numFields: 2,
-    settings: DEFAULT_SCHEDULE
+    numFields: 2
   };
   componentWillMount() {
     /* Create reference to messages in Firebase Database */
@@ -88,11 +87,6 @@ class App extends Component {
         };
       });
     });
-
-    fire
-      .database()
-      .ref("settings")
-      .on("value", snapshot => this.setState({ settings: snapshot.val() }));
   }
 
   addTeam(newTeam) {
@@ -106,24 +100,20 @@ class App extends Component {
   }
 
   render() {
-    const { settings } = this.state,
-      games = Object.values(this.state.games),
+    const games = Object.values(this.state.games),
       teams = Object.values(this.state.teams).filter(team => team);
 
-    return (
+    return (<React.Fragment>
       <Router>
-        <Admin path="/admin" teams={teams} games={games} settings={settings} />
-        <Admin
-          path="z-mode"
-          teams={teams}
-          games={games}
-          settings={settings}
-          masterMode
-        />
-        <Registrations path="/registrations"/>
-        <View default teams={teams} games={games} settings={settings} />
+        <Generator path="z-mode" teams={teams}/>
       </Router>
-    );
+      <Router>
+        <Admin path="/admin" teams={teams} games={games} />
+        <Admin path="z-mode" teams={teams} games={games} masterMode/>
+        <Registrations path="/registrations"/>
+        <View default teams={teams} games={games} />
+      </Router>
+    </React.Fragment>);
   }
 }
 

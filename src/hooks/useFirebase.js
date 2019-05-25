@@ -23,6 +23,7 @@ const useQuery = location => {
 
   return useMemo(() => ({
     ...firebaseRef,
+    set: firebaseRef.set,
     data
   }), [firebaseRef, data]);
 };

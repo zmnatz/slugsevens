@@ -1,62 +1,42 @@
-import React, { Component } from 'react';
-import fire from '../api/fire';
+import React, { useCallback, useMemo } from 'react';
 import { Form } from 'semantic-ui-react'
 import { handleFocus } from '../utils'
+import useFirebase from 'hooks/useFirebase'
 
-export const DEFAULT_SCHEDULE = {
-  startTime: 900,
-  increment: 60,
-  numFields: 2
-}
+export default () => {
+  const settings = useFirebase('settings');
+  
+  const onChange = useCallback((e, {name, value}) => {
+      settings.set({
+        ...settings.data,
+        [name]: Number(value)
+      })
+    },
+    [settings]
+  )
 
-export default class ScheduleSettings extends Component {
-  state = {
-    settings: { ...DEFAULT_SCHEDULE }
-  }
-
-  componentWillMount() {
-    fire.database().ref('settings').on('value', snapshot => {
-      this.setState({ settings: snapshot.val() });
-    })
-  }
-
-  _scheduleChange = (e, { name, value }) => {
-    this.setState(prev => ({
-      settings: {
-        ...prev.settings,
-        [name]: value.length > 0 ? parseInt(value, 10) : value
-      }
-    }));
-  }
-
-  _handleSubmit() {
-    fire.database().ref('settings').set({
-      ...DEFAULT_SCHEDULE,
-      ...this.state.settings
-    });
-  }
-
-  render() {
-    const { settings: { numFields, increment, startTime } } = this.state;
-
-    return <Form onSubmit={this._handleSubmit.bind(this)}>
+  return useMemo(() => {
+    const { numFields = 3, increment = 20, startTime=900 } = settings.data;
+    return <Form>
       <Form.Group>
-        <Form.Input inline name="numFields" type="number" value={numFields} label="Number of Fields"
-          min={1} max={5}
+        <Form.Input inline name="numFields" type="number" 
+          value={numFields} label="Fields"
+          min={1} max={4}
           onFocus={handleFocus}
-          onChange={this._scheduleChange.bind(this)}
+          onChange={onChange}
         />
-        <Form.Input inline name="increment" type="number" value={increment} label="Increment"
-          step={5}
+        <Form.Input inline name="increment" type="number" 
+          value={increment} label="Increment"
+          step={10}
           onFocus={handleFocus}
-          onChange={this._scheduleChange.bind(this)}
+          onChange={onChange}
         />
-        <Form.Input inline type="number" name="startTime" value={startTime} label="Start Time"
+        <Form.Input inline type="number" name="startTime" 
+          value={startTime} label="Start"
           onFocus={handleFocus}
-          onChange={this._scheduleChange.bind(this)}
+          onChange={onChange}
         />
-        <Form.Button type="submit">Save Settings</Form.Button>
       </Form.Group>
     </Form>
-  }
+  }, [settings, onChange])
 }

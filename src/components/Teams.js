@@ -2,7 +2,6 @@ import React from 'react';
 import { Grid } from 'semantic-ui-react'
 import Team from './Team'
 import AddTeam from './AddTeam';
-import useFirebase from '../hooks/useFirebase'
 
 import { rankTeams, groupBy } from '../utils'
 

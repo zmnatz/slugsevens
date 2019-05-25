@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useMemo, useCallback } from 'react';
 
 import fire from '../api/fire';
 import robin from 'roundrobin';
@@ -6,6 +6,7 @@ import { Button } from 'semantic-ui-react'
 
 import { groupBy } from '../utils';
 import ScheduleSettings from './ScheduleSettings';
+import useFirebase from '../hooks/useFirebase'
 
 const checkRound = (i, schedule, round) => {
   if (round[i]) {
@@ -40,66 +41,75 @@ const generateRound = (teams) => {
   }));
 }
 
-export default class Generator extends Component {
-  determineTime(round) {
-    const { settings: { increment, startTime } } = this.props;
-    let numMinutes = round * increment,
-      hours = Math.floor(numMinutes / 60),
-      totalMinutes = startTime % 100 + numMinutes % 60;
+function determineTime(round, settings) {
+  const {increment, startTime} = settings;
+  let numMinutes = round * increment,
+    hours = Math.floor(numMinutes / 60),
+    totalMinutes = startTime % 100 + numMinutes % 60;
 
-    if (totalMinutes > 59) {
-      hours += Math.floor(totalMinutes / 60);
-      totalMinutes -= Math.floor(totalMinutes / 60) * 60;
+  if (totalMinutes > 59) {
+    hours += Math.floor(totalMinutes / 60);
+    totalMinutes -= Math.floor(totalMinutes / 60) * 60;
+  }
+
+  return startTime + hours * 100 + (startTime % 100 + totalMinutes)
+}
+
+function setLocation (games, settings) {
+  const {numFields} = settings;
+  return games.map((game, index) => {
+    let time = determineTime(Math.floor(index / numFields), settings);
+    if (time < 1000) {
+      time = '0' + time;
+    } else {
+      time += ''
     }
+    return {
+      ...game,
+      field: (index % numFields) + 1,
+      time
+    }
+  })
+}
 
-    return startTime + hours * 100 + (startTime % 100 + totalMinutes)
-  }
+export default ({teams}) => {
+  const {data: settings } = useFirebase('settings');
 
-  setLocation = (numFields, games) =>
-    games.map((game, index) => {
-      let time = this.determineTime(Math.floor(index / numFields));
-      if (time < 1000) {
-        time = '0' + time;
-      } else {
-        time += ''
-      }
-      return {
+  const groupedTeams = useMemo(
+    () => groupBy(teams, 'division'),
+    [teams]
+  )
+
+  const onGenerate = useCallback(
+    () => {
+      const games = [
+        ...generateRound(groupedTeams)
+      ];
+      const scheduledGames = setLocation(games, settings);
+      const enrichedGames = scheduledGames.map(game => ({
         ...game,
-        field: (index % numFields) + 1,
-        time
-      }
-    })
+        score: {
+          home: 0,
+          away: 0
+        },
+        complete: false
+      }));      
 
-  _handleGenerate(teams) {
-    const games = [
-      ...generateRound(teams)
-    ],
-      scheduledGames = this.setLocation(this.props.settings.numFields, games);
-
-    console.log(scheduledGames);
-
-    fire.database().ref('games').remove().then(() => {
-      for (const game of scheduledGames) {
-        fire.database().ref('games').push({
-          ...game,
-          score: {
-            home: 0,
-            away: 0
-          },
-          complete: false
-        })
-      }
-    })
-  }
-
-
-  render() {
-    const teams = groupBy(this.props.teams, 'division');
-    return <div style={{ display: 'flex' }}>
+      const db = fire.database().ref('games');
+      db.remove().then(() => 
+        enrichedGames.forEach(game => 
+          db.push(game)
+        )
+      );
+    },
+    [settings, groupedTeams]
+  )
+  return React.useMemo(() => (
+    <div style={{ display: 'flex' }}>
       <ScheduleSettings style={{ flex: 1 }} />
-      <Button type="primary" onClick={this._handleGenerate.bind(this, teams)}>
+      <Button type="primary" onClick={onGenerate}>
         Generate
       </Button>
     </div>
-  }
+  ), [onGenerate])
 }
