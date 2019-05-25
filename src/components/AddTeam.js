@@ -1,38 +1,43 @@
-import React, {Component} from 'react';
-import fire from '../api/fire';
+import React, {useState, useCallback, useMemo} from 'react';
 import {Form} from 'semantic-ui-react'
+import firebase from '../api/fire'
 
-export default class AddTeam extends Component {
-  state = {
-    name: '',
-    pool: 'A'
-  }
+const defaults = {name: '', pool: 'A'}
 
-  _handleChange (e, {name, value}) {
-    this.setState(prev => ({
+export default ({division}) => {
+  const [state, setState] = useState(defaults);
+
+  const onChange = useCallback(
+    (e, {name, value}) => setState(prev => ({
       ...prev,
       [name]: value
-    }));
-  }
+    })),
+    [setState]
+  )
 
-  _handleSubmit () {
-    fire.database().ref('teams').push({
-        ...this.state,
-        division: this.props.division
-      })
-      .then(() => this.setState({name: ''}));
-  }
+  const onSubmit = useCallback(
+    () => {
+      firebase.database().ref('teams')
+        .push({
+          ...state,
+          division
+        })
+    },
+    [division, state]
+  )
 
-  render () {
-    const {name, pool} = this.state;
-    return <Form onSubmit={this._handleSubmit.bind(this)}>
-      <Form.Input label="Team" name="name" value={name}
-        onChange={this._handleChange.bind(this)}
+  return useMemo(() => {
+    const {name, pool} = state;
+    return <Form onSubmit={onSubmit}>
+      <Form.Input label="Team" name="name" 
+        value={name}
+        required onChange={onChange}
       />
-      <Form.Input label="Pool" name="pool" value={pool} 
-        onChange={this._handleChange.bind(this)}
+      <Form.Input label="Pool" name="pool" 
+        value={pool} 
+        required onChange={onChange}
       />
       <Form.Button type='submit'>Add Team</Form.Button>
     </Form>
-  }
+  }, [state, onChange, onSubmit])
 }

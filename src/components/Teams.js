@@ -2,10 +2,11 @@ import React from 'react';
 import { Grid } from 'semantic-ui-react'
 import Team from './Team'
 import AddTeam from './AddTeam';
+import useFirebase from '../hooks/useFirebase'
 
 import { rankTeams, groupBy } from '../utils'
 
-export const TeamList = ({ teams, editable }) => Object.entries(groupBy(teams, 'pool'))
+const List = ({ teams, editable }) => Object.entries(groupBy(teams, 'pool'))
   .map(entry =>
     <div key={entry[0]}>
       <h4>Pool {entry[0]}</h4>
@@ -25,9 +26,10 @@ export const TeamList = ({ teams, editable }) => Object.entries(groupBy(teams, '
     </div>
   )
 
-export default ({ division, teams, editable }) =>
-  <div>
+export default ({ teams, division, editable }) => {
+  return <div>
     <h3>{division}</h3>
     {editable && <AddTeam division={division} />}
-    <TeamList teams={teams} editable={editable} />
+    <List teams={teams} editable={editable} />
   </div>
+}

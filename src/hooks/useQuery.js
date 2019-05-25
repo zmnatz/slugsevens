@@ -7,23 +7,18 @@ const useQuery = location => {
     () =>
       fire
         .database()
-        .ref(location),
+        .ref(location)
+        .orderByKey(),
     [location]
   );
 
   useEffect(() => {
-    firebaseRef.on("value", snapshot => {
-      setData({
-        id: snapshot.key,
-        ...snapshot.val()
-      })
-      return () => firebaseRef.off('value');
-    })
+    firebaseRef.on("value", snapshot => 
+      setData(Object.values(snapshot.val()))
+    )
+    return () => firebaseRef.off('value');
   }, [firebaseRef])
 
-  return useMemo(() => ({
-    ...firebaseRef,
-    data
-  }), [firebaseRef, data]);
+  return data;
 };
 export default useQuery;
