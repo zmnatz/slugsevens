@@ -8,17 +8,15 @@ const Score = ({score}) =>
     </Label>
   </List.Icon>
 
-export default ({game, game: {score}}) => {
+export default ({game}) => {
+  const {score = {}} = game;
+  
   return <List verticalAlign='middle'>
-    <List.Item
-      icon={game.inProgress || game.complete ? 
-        <Score score={score.away}/> : undefined
-      }
+    <List.Item 
+      icon={<Score score={score.away || 0}/>}
       content={game.away.name}
     />
-    <List.Item 
-      icon={game.inProgress || game.complete ? 
-        <Score score={score.home}/> : undefined
+    <List.Item icon={<Score score={score.home || 0}/>
       }
       content={game.home.name}
     />

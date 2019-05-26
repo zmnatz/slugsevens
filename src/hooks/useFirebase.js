@@ -1,21 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
 import fire from "../api/fire";
 
-const useQuery = location => {
-  const [data, setData] = useState([]);
+const useQuery = (location, defaultValue = []) => {
+  const [data, setData] = useState(defaultValue);
   const firebaseRef = useMemo(
-    () =>
-      fire
-        .database()
-        .ref(location),
+    () => fire.database().ref(location),
     [location]
   );
-
   useEffect(() => {
     firebaseRef.on("value", snapshot => {
-      setData({
+      const value = snapshot.val()
+      setData(value == null ? null : {
         id: snapshot.key,
-        ...snapshot.val()
+        ...value
       })
       return () => firebaseRef.off('value');
     })
@@ -24,6 +21,8 @@ const useQuery = location => {
   return useMemo(() => ({
     ...firebaseRef,
     set: firebaseRef.set,
+    update: firebaseRef.update,
+    remove: firebaseRef.remove,
     data
   }), [firebaseRef, data]);
 };

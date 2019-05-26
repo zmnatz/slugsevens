@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Grid, Button } from 'semantic-ui-react';
 import fire from '../api/fire';
+import Permissions from 'state/permissions'
 
 const onDelete = (team) => {
   fire.database().ref(`teams/${team.id}`).remove();
 }
 
-const Team = ({ team, editable }) =>
-  <Grid.Row>
+const Team = ({ team }) => {
+  const {master} = useContext(Permissions);
+  return <Grid.Row>
     <Grid.Column width={6}>
       {team.name}
-      {editable &&
-        <Button icon="delete" color='red' float="right"
-          onClick={onDelete.bind(this, team)} />
+      {master && <Button icon="delete" color='red' float="right"
+          onClick={onDelete} />
       }
     </Grid.Column>
     <Grid.Column>{team.wins}</Grid.Column>
@@ -21,4 +22,5 @@ const Team = ({ team, editable }) =>
     <Grid.Column>{team.pf}</Grid.Column>
     <Grid.Column>{team.pa}</Grid.Column>
   </Grid.Row>
+}
 export default Team;

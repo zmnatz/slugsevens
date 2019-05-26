@@ -40,10 +40,7 @@ class Registrations extends React.Component {
   }
 
   removeTeam = (team) => {
-    fire.database().ref(`registration/${team.id}`).set({
-      ...team,
-      deleted: true
-    })
+    fire.database().ref(`registration/${team.id}`).update({deleted: true})
   }
   
 

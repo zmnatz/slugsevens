@@ -7,8 +7,7 @@ export default () => {
   const settings = useFirebase('settings');
   
   const onChange = useCallback((e, {name, value}) => {
-      settings.set({
-        ...settings.data,
+      settings.update({
         [name]: Number(value)
       })
     },
@@ -28,6 +27,7 @@ export default () => {
         <Form.Input inline name="increment" type="number" 
           value={increment} label="Increment"
           step={10}
+          min={20}
           onFocus={handleFocus}
           onChange={onChange}
         />

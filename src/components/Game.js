@@ -1,201 +1,136 @@
-import React, { Component } from "react";
-import { Form, Card } from "semantic-ui-react";
-import fire from "../api/fire";
+import React, { useCallback, useContext } from "react";
+import { Form, Card, Label } from "semantic-ui-react";
 
 import Score from "./Score";
-import { handleFocus } from "../utils";
+import { handleFocus } from "utils";
+import useFirebase from 'hooks/useFirebase';
+import Permissions from 'state/permissions'
 
-export default class Game extends Component {
-  _handleScoreChange(team, e, { value }) {
-    e.preventDefault();
-    const { game } = this.props;
-    fire
-      .database()
-      .ref(`games/${game.id}`)
-      .set({
-        ...game,
-        inProgress: true,
-        complete: false,
-        score: {
-          ...game.score,
-          [team]: value
-        }
-      });
-  }
+export default (props) => {
+  const game = useFirebase(`games/${props.id}`, null);
+  const {master, admin} = useContext(Permissions);
 
-  _handleScoreComplete() {
-    const {
-      game,
-      game: {
-        score: { home, away }
+  const onScoreChange = useCallback((e, { name, value }) => {
+    game.update({
+      inProgress: true,
+      complete: false,
+      score: {
+        ...game.data.score,
+        [name]: Number(value)
       }
-    } = this.props;
-    fire
-      .database()
-      .ref(`games/${game.id}`)
-      .set({
-        ...game,
-        inProgress: false,
-        complete: true,
-        score: {
-          home: home === "" ? 0 : parseInt(home, 10),
-          away: away === "" ? 0 : parseInt(away, 10)
+    });
+  }, [game])
+
+  const onScoreComplete = useCallback(() => {
+    game.update({
+      inProgress: false,
+      complete: true,
+    });
+  }, [game])
+
+  const onChange = useCallback((e, {name, value}) => {
+    game.update({[name]: value})
+  }, [game])
+
+  const _fixScore = useCallback(() => {
+    game.update({
+      inProgress: true,
+      complete: false
+    });
+  }, [game])
+
+  const onDelete = useCallback(() => {
+    game.remove();
+  }, [game]);
+
+  if (game.data == null) {
+    return null;
+  }
+  
+  const {score} = game.data;
+
+  return (
+    <Card>
+      <Card.Content>
+        {master && 
+          <Label as="a" color="red" icon="delete" corner="right"
+            title="Delete Game" onClick={onDelete}
+          />
         }
-      });
-  }
-
-  _handleTimeChange = (e, { value }) => {
-    const { game } = this.props;
-    fire
-      .database()
-      .ref(`games/${game.id}`)
-      .set({
-        ...game,
-        time: value
-      });
-  };
-
-  _handleFieldChange = (e, { value }) => {
-    const { game } = this.props;
-
-    fire
-      .database()
-      .ref(`games/${game.id}`)
-      .set({
-        ...game,
-        field: value - 2
-      });
-  };
-
-  _handleRefChange = (e, { value }) => {
-    const { game } = this.props;
-    fire
-      .database()
-      .ref(`games/${game.id}`)
-      .set({
-        ...game,
-        referee: value
-      });
-  };
-
-  _fixScore(game) {
-    fire
-      .database()
-      .ref(`games/${game.id}`)
-      .set({
-        ...game,
-        inProgress: true,
-        complete: false
-      });
-  }
-
-  _deleteGame = () => {
-    const { game } = this.props;
-    fire
-      .database()
-      .ref(`games/${game.id}`)
-      .remove();
-  };
-
-  render() {
-    const {
-      game,
-      readOnly,
-      game: { score },
-      field,
-      editable,
-      editMode
-    } = this.props;
-
-    return (
-      <Card>
-        <Card.Content>
-          <Card.Header>
-            Field {field} - {game.time}
-          </Card.Header>
-          <Card.Description>
-            {game.complete || readOnly ? (
-              <Score game={game} readOnly />
-            ) : (
-              <Form onSubmit={this._handleScoreComplete.bind(this, score)}>
-                {editMode && (
-                  <React.Fragment>
-                    <Form.Input
-                      type="number"
-                      value={game.time}
-                      label="Time"
-                      onChange={this._handleTimeChange}
-                      onFocus={handleFocus}
-                    />
-                    <Form.Input
-                      type="number"
-                      value={game.field}
-                      label="Field"
-                      onChange={this._handleFieldChange}
-                      onFocus={handleFocus}
-                    />
-                    <Form.Button basic color="red" onClick={this._deleteGame}>
-                      Delete Game
-                    </Form.Button>
-                  </React.Fragment>
-                )}
-
+        <Card.Header>
+          {game.data.division}: Field {game.data.field} - {game.data.time}
+        </Card.Header>
+        <Card.Description>
+          {game.data.complete || !admin ? (
+            <Score game={game.data} />
+          ) : (
+            <Form onSubmit={onScoreComplete}>
+              {master && (
+                <Form.Group inline unstackable widths="equal">
+                  <Form.Input fluid
+                    type="number"
+                    value={game.data.time}
+                    label="Time"
+                    name="time"
+                    onChange={onChange}
+                    onFocus={handleFocus}
+                  />
+                  <Form.Input fluid
+                    type="number"
+                    value={game.data.field}
+                    label="Field"
+                    name="field"
+                    onChange={onChange}
+                    onFocus={handleFocus}
+                  />
+                </Form.Group>
+              )}
+              <Form.Group widths="equal" inline unstackable>
                 <Form.Input
                   fluid
                   type="number"
+                  name="away"
                   value={score.away}
-                  label={game.away.name}
-                  readOnly={game.complete}
-                  onChange={this._handleScoreChange.bind(this, "away")}
+                  label={game.data.away.name}
+                  onChange={onScoreChange}
                   onFocus={handleFocus}
                 />
                 <Form.Input
                   fluid
                   type="number"
+                  name="home"
                   value={score.home}
-                  label={game.home.name}
-                  readOnly={game.complete}
-                  onChange={this._handleScoreChange.bind(this, "home")}
+                  label={game.data.home.name}
+                  onChange={onScoreChange}
                   onFocus={handleFocus}
                 />
-                <Form.Input
-                  fluid
-                  value={game.referee}
-                  label="Referee"
-                  onChange={this._handleRefChange}
-                  onFocus={handleFocus}
-                />
-                {game.inProgress ? (
-                  <Form.Button
-                    basic
-                    color="green"
-                    floated="right"
-                    type="submit"
-                  >
-                    Finalize
-                  </Form.Button>
-                ) : (
-                  ""
-                )}
-              </Form>
-            )}
-          </Card.Description>
+              </Form.Group>
+              <Form.Input
+                fluid
+                value={game.data.referee}
+                label="Referee"
+                name="referee"
+                onChange={onChange}
+                onFocus={handleFocus}
+              />
+            </Form>
+          )}
+        </Card.Description>
+      </Card.Content>
+      {admin && game.data.complete && 
+        <Card.Content extra>
+          <Form.Button basic color="red" floated="right" onClick={_fixScore}>
+            Fix Score
+          </Form.Button>
         </Card.Content>
-        {game.complete && editable ? (
-          <Card.Content extra>
-            <Form.Button
-              basic
-              color="red"
-              floated="right"
-              onClick={this._fixScore.bind(this, game)}
-            >
-              Fix Score
-            </Form.Button>
-          </Card.Content>
-        ) : (
-          ""
-        )}
-      </Card>
-    );
-  }
+      }
+      {admin && game.data.inProgress && 
+        <Card.Content extra>
+          <Form.Button basic color="green" floated="right" onClick={onScoreComplete}>
+            Finalize
+          </Form.Button>
+        </Card.Content>
+      }
+    </Card>
+  );
 }

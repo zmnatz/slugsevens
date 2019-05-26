@@ -11,7 +11,7 @@ export default ({teams, games}) => <Segment>
     {
       menuItem: 'Schedule',
       render: () => 
-        <Schedule readOnly games={games} teams={teams} />
+        <Schedule games={games} teams={teams} />
     },
     ...DIVISIONS.map(division => ({
       menuItem: division,

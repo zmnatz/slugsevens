@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useContext, useEffect } from 'react';
 
 import fire from '../api/fire';
 import robin from 'roundrobin';
@@ -7,6 +7,7 @@ import { Button } from 'semantic-ui-react'
 import { groupBy } from '../utils';
 import ScheduleSettings from './ScheduleSettings';
 import useFirebase from '../hooks/useFirebase'
+import Permissions from 'state/permissions'
 
 const checkRound = (i, schedule, round) => {
   if (round[i]) {
@@ -35,9 +36,9 @@ const generateRound = (teams) => {
   } while (schedule.length > gameCount && i < 5);
 
   return schedule.map(game => ({
-    away: game[0],
-    home: game[1],
-    division: game[0].division + ' Division'
+    home: game[0],
+    away: game[1],
+    division: game[0].division
   }));
 }
 
@@ -74,6 +75,9 @@ function setLocation (games, settings) {
 
 export default ({teams}) => {
   const {data: settings } = useFirebase('settings');
+  const {setMaster} = useContext(Permissions);
+
+  useEffect(() => setMaster(true), [setMaster]);
 
   const groupedTeams = useMemo(
     () => groupBy(teams, 'division'),

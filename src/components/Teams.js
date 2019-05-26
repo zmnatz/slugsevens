@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Grid } from 'semantic-ui-react'
 import Team from './Team'
 import AddTeam from './AddTeam';
 
+import Permissions from 'state/permissions';
 import { rankTeams, groupBy } from '../utils'
 
-const List = ({ teams, editable }) => Object.entries(groupBy(teams, 'pool'))
-  .map(entry =>
+const List = ({ teams }) => {
+  return Object.entries(groupBy(teams, 'pool')).map(entry =>
     <div key={entry[0]}>
       <h4>Pool {entry[0]}</h4>
       <Grid celled columns='equal'>
@@ -19,16 +20,18 @@ const List = ({ teams, editable }) => Object.entries(groupBy(teams, 'pool'))
           <Grid.Column>PA</Grid.Column>
         </Grid.Row>
         {entry[1].sort(rankTeams).map(team =>
-          <Team key={team.id} team={team} editable={editable} />
+          <Team key={team.id} team={team} />
         )}
       </Grid>
     </div>
   )
+}
 
-export default ({ teams, division, editable }) => {
+export default ({ teams, division }) => {
+  const {master} = useContext(Permissions);
   return <div>
     <h3>{division}</h3>
-    {editable && <AddTeam division={division} />}
-    <List teams={teams} editable={editable} />
+    {master && <AddTeam division={division} />}
+    <List teams={teams} />
   </div>
 }

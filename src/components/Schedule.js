@@ -6,6 +6,7 @@ import FilterMenu from './FilterMenu'
 import Game from 'components/Game';
 
 import useQuery from 'hooks/useQuery';
+import {groupBy} from 'utils/'
 
 export default (props) => {
   const [sidebar, setSidebar] = useState(false);
@@ -29,18 +30,16 @@ export default (props) => {
   )
 
   const scores = useMemo(
-    () => <Card.Group>
-      {filteredGames.map((game, index) => 
-        <Game key={index}
-          readOnly={props.readOnly}
-          editMode={props.masterMode}
-          game={game}
-          field={game.field}
-          editable={props.editable}
-        />
-      )}
-    </Card.Group>,
-    [filteredGames, props]
+    () => Object.values(groupBy(filteredGames, 'time')).map(groupedGames => 
+        <Segment key={groupedGames[0].time}>
+          <Card.Group>
+          {groupedGames.map((game, index) => 
+            <Game key={game.id} id={game.id}/>
+          )}
+          </Card.Group>
+        </Segment>
+      ),
+    [filteredGames]
   )
 
   return useMemo(() => (
