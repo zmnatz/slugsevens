@@ -1,71 +1,38 @@
-import React from 'react';
-import fire from '../api/fire'
+import React, { useMemo, useCallback } from 'react';
 import {Grid, Button} from 'semantic-ui-react'
+import useQuery from 'hooks/useQuery';
+import useFirebase from 'hooks/useFirebase'
 
-class Registrations extends React.Component {
-  state = {
-    teams: []
-  }
-  componentDidMount () {
-    const teams = fire
-      .database()
-      .ref('registration')
-      .orderByKey();
-    teams.on('child_added', snapshot => {
-        this.setState(prev => ({
-          teams: [
-            ...prev.teams,
-            {
-              ...snapshot.val(),
-              id: snapshot.key
-            }
-          ]
-        }))
-      })
-    teams.on('child_changed', snapshot => {
-        this.setState(prev => {
-          const teams = [...prev.teams];
-          teams.splice(
-            teams.findIndex(({id}) => id === snapshot.key),
-            1,
-            {...snapshot.val(), id: snapshot.key}
-          )
-          return {teams}
-        })
-      })
-
-    teams.on('child_removed', snapshot => this.setState(prev => ({
-      teams: prev.teams.filter(({id}) => id !== snapshot.key)
-    })))
-  }
-
-  removeTeam = (team) => {
-    fire.database().ref(`registration/${team.id}`).update({deleted: true})
-  }
+const RegistrationRow = ({id}) => {
+  const registration = useFirebase(`registration/${id}`);
+  const {team, email, division} = registration.data;
   
+  const onDelete = useCallback(() => registration.remove(), [registration])
 
-  render () {
-    return <Grid celled columns='equal'>
+  return <Grid.Row key={id}> 
+    <Grid.Column>{team}</Grid.Column>
+    <Grid.Column>{email}</Grid.Column>
+    <Grid.Column>{division}</Grid.Column>
+    <Grid.Column>
+      <Button color="red" onClick={onDelete}>
+        Delete
+      </Button>
+    </Grid.Column>
+  </Grid.Row>
+}
+
+export default _ => {
+  const teams = useQuery('registration');
+
+  return useMemo(() => <Grid celled columns='equal'>
     <Grid.Row>
       <Grid.Column>Team</Grid.Column>
       <Grid.Column>Email</Grid.Column>
       <Grid.Column>Division</Grid.Column>
       <Grid.Column>Delete</Grid.Column>
     </Grid.Row>
-    {this.state.teams
-      .filter(({deleted}) => !deleted)
-      .map(props => {
-      const {team, email, division} = props;
-      return <Grid.Row key={props.id}> 
-        <Grid.Column>{team}</Grid.Column>
-        <Grid.Column>{email}</Grid.Column>
-        <Grid.Column>{division}</Grid.Column>
-        <Grid.Column>
-          <Button color="red" onClick={this.removeTeam.bind(this, props)}>Delete</Button>
-        </Grid.Column>
-      </Grid.Row>
-    })}
-  </Grid>;
-  }
+    {teams.filter(({deleted}) => !deleted).map(
+      ({id}) => <RegistrationRow key={id} id={id}/>
+    )}
+  </Grid>, [teams])
 }
-export default Registrations;

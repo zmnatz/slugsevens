@@ -19,11 +19,9 @@ const generateRound = (teams) => {
   const divisions = Object.keys(teams);
   const schedules = divisions.reduce((scheduled, divisionName) => {
     const pools = groupBy(teams[divisionName], 'pool');
-    for (let pool of Object.entries(pools)) {
-      const poolName = pool[0],
-        poolTeams = pool[1];
+    Object.entries(pools).forEach(([poolName, poolTeams]) => {
       scheduled[divisionName + poolName] = robin(poolTeams.length, poolTeams);
-    }
+    })
     // scheduled[divisionName] = robin(4, teams[divisionName])
     return scheduled;
   }, {})
@@ -73,6 +71,14 @@ function setLocation (games, settings) {
   })
 }
 
+function resetSchedule (games) {
+  const db = fire.database().ref('games');
+  db.remove()
+  .then(() => 
+    games.forEach(game => db.push(game))
+  );
+}
+
 export default ({teams}) => {
   const {data: settings } = useFirebase('settings');
   const {setMaster} = useContext(Permissions);
@@ -98,13 +104,7 @@ export default ({teams}) => {
         },
         complete: false
       }));      
-
-      const db = fire.database().ref('games');
-      db.remove().then(() => 
-        enrichedGames.forEach(game => 
-          db.push(game)
-        )
-      );
+      resetSchedule(enrichedGames);
     },
     [settings, groupedTeams]
   )

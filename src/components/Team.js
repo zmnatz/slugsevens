@@ -1,19 +1,19 @@
-import React, { useContext } from 'react';
-import { Grid, Button } from 'semantic-ui-react';
+import React, { useContext, useCallback } from 'react';
+import { Grid, Button, Label } from 'semantic-ui-react';
 import fire from '../api/fire';
 import Permissions from 'state/permissions'
 
-const onDelete = (team) => {
-  fire.database().ref(`teams/${team.id}`).remove();
-}
-
 const Team = ({ team }) => {
   const {master} = useContext(Permissions);
+  const onDelete = useCallback(() => 
+    fire.database().ref(`teams/${team.id}`).remove(),
+    [team]
+  )
   return <Grid.Row>
     <Grid.Column width={6}>
       {team.name}
-      {master && <Button icon="delete" color='red' float="right"
-          onClick={onDelete} />
+      {master && 
+        <Label corner="right" as="a" color="red" icon="delete" onClick={onDelete}/>
       }
     </Grid.Column>
     <Grid.Column>{team.wins}</Grid.Column>

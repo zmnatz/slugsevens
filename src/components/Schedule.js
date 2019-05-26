@@ -8,8 +8,8 @@ import Game from 'components/Game';
 import useQuery from 'hooks/useQuery';
 import {groupBy} from 'utils/'
 
-export default (props) => {
-  const [sidebar, setSidebar] = useState(false);
+export default _ => {
+  const [sidebar, setSidebar] = useState();
   const [selected, setSelected] = useState();
   const games = useQuery('games');
   
@@ -43,7 +43,7 @@ export default (props) => {
   )
 
   return useMemo(() => (
-    <Segment basic loading={games.length < 1}>
+    <Segment basic >
       <FilterMenu filter={selected} visible={sidebar}
         onToggle={toggleSidebar} clearSelected={clearSelected}/>
       <Sidebar.Pushable as={Segment}>
@@ -56,5 +56,5 @@ export default (props) => {
         </Sidebar.Pusher>
       </Sidebar.Pushable>
     </Segment>
-  ),[scores, sidebar, selected, clearSelected, toggleSidebar, games])
+  ),[scores, sidebar, selected, clearSelected, toggleSidebar])
 }
