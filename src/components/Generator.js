@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useContext, useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
 
 import fire from '../api/fire';
 import robin from 'roundrobin';
@@ -7,7 +7,6 @@ import { Button } from 'semantic-ui-react'
 import { groupBy } from '../utils';
 import ScheduleSettings from './ScheduleSettings';
 import useFirebase from '../hooks/useFirebase'
-import Permissions from 'state/permissions'
 
 const checkRound = (i, schedule, round) => {
   if (round[i]) {
@@ -81,9 +80,6 @@ function resetSchedule (games) {
 
 export default ({teams}) => {
   const {data: settings } = useFirebase('settings');
-  const {setMaster} = useContext(Permissions);
-
-  useEffect(() => setMaster(true), [setMaster]);
 
   const groupedTeams = useMemo(
     () => groupBy(teams, 'division'),

@@ -28,10 +28,10 @@ const List = ({ teams }) => {
 }
 
 export default ({ teams, division }) => {
-  const {master} = useContext(Permissions);
+  const {admin} = useContext(Permissions);
   return <div>
     <h3>{division}</h3>
-    {master && <AddTeam division={division} />}
+    {admin && <AddTeam division={division} />}
     <List teams={teams} />
   </div>
 }

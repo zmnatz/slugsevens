@@ -17,7 +17,7 @@ export default () => {
   return useMemo(() => {
     const { numFields = 3, increment = 20, startTime=900 } = settings.data;
     return <Form>
-      <Form.Group>
+      <Form.Group inline>
         <Form.Input inline name="numFields" type="number" 
           value={numFields} label="Fields"
           min={1} max={4}

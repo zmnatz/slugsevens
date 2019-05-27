@@ -1,4 +1,5 @@
 import React, {useMemo, useState} from 'react';
+import fire from 'api/fire';
 
 const PermissionContext = React.createContext({
   admin: false,
@@ -8,11 +9,25 @@ const PermissionContext = React.createContext({
 const PermissionComponent = ({children}) => {
   const [admin, setAdmin] = useState(false);
   const [master, setMaster] = useState(false);
+  const [user, setUser] = useState();
 
-  return useMemo(() => <PermissionContext.Provider value={{admin, master, setAdmin, setMaster}}>
+  React.useEffect(() => {
+    fire.auth().onAuthStateChanged(user=> {
+      setUser(user);
+      console.log(user);
+      if (user == null) {
+        setMaster(false);
+      } else {
+        fire.database().ref(`roles/masters/${user.uid}`)
+          .once('value', snapshot => setMaster(true))
+      }
+    })
+  }, [])
+
+  return useMemo(() => <PermissionContext.Provider value={{user, admin, master, setAdmin, setMaster}}>
     {children}
   </PermissionContext.Provider>,
-  [admin, master, setAdmin, setMaster, children]
+  [user, admin, master, setAdmin, setMaster, children]
   )
 }
 

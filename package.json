@@ -5,6 +5,7 @@
   "dependencies": {
     "@reach/router": "1.2.1",
     "firebase": "5.11.1",
+    "firebaseui": "^4.0.0",
     "netlify-lambda": "^0.4.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

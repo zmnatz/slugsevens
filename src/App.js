@@ -6,7 +6,6 @@ import { SCORE_DEFAULTS, determineOutcomes, reverseOutcome } from "./utils";
 import Admin from "./components/Admin";
 import View from "./components/View";
 import Registrations from './components/Registrations'
-import Generator from './components/Generator'
 import {PermissionProvider} from 'state/permissions'
 
 class App extends Component {
@@ -105,9 +104,6 @@ class App extends Component {
       teams = Object.values(this.state.teams).filter(team => team);
 
     return (<PermissionProvider>
-      <Router>
-        <Generator path="admin/master" teams={teams}/>
-      </Router>
       <Router>
         <Admin path="admin/*" teams={teams} games={games} />
         <Registrations path="/registrations"/>
