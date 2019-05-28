@@ -14,12 +14,18 @@ const useQuery = location => {
 
   useEffect(() => {
     firebaseRef.on("value", snapshot => {
-      const value = snapshot.val();
-      if (value != null) {
-        setData(Object.keys(value).map(id => ({
-          ...value[id],
-          id
-        })))
+      if (snapshot.exists()) {
+        const value = snapshot.val();
+        setData(Object.keys(value).map(id => {
+          if (typeof value[id] === 'object') {
+            return {
+              ...value[id],
+              id
+            }
+          } else {
+            return value[id]
+          }
+        }))
       } else {
         setData([])
       }

@@ -6,6 +6,16 @@ const PermissionContext = React.createContext({
   master: false
 })
 
+function initUser(userRef, user) {
+  return userRef.set({
+    email: user.email,
+    displayName: user.displayName,
+    roles: {
+      master: true
+    }
+  });
+}
+
 const PermissionComponent = ({children}) => {
   const [admin, setAdmin] = useState(false);
   const [master, setMaster] = useState(false);
@@ -14,20 +24,25 @@ const PermissionComponent = ({children}) => {
   React.useEffect(() => {
     fire.auth().onAuthStateChanged(user=> {
       setUser(user);
-      console.log(user);
       if (user == null) {
         setMaster(false);
       } else {
-        fire.database().ref(`roles/masters/${user.uid}`)
-          .once('value', snapshot => setMaster(true))
+        const userRef = fire.database().ref(`users/${user.uid}`)
+        userRef.once('value', snapshot=> {
+          if (!snapshot.exists()) {
+            initUser(userRef, user);
+          } else if (snapshot.val().roles.master) {
+            setMaster(true);
+          }
+        })
       }
     })
   }, [])
 
-  return useMemo(() => <PermissionContext.Provider value={{user, admin, master, setAdmin, setMaster}}>
+  return useMemo(() => <PermissionContext.Provider value={{user, admin, master, setAdmin}}>
     {children}
   </PermissionContext.Provider>,
-  [user, admin, master, setAdmin, setMaster, children]
+  [user, admin, master, setAdmin, children]
   )
 }
 

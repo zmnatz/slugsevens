@@ -15,11 +15,10 @@ const checkRound = (i, schedule, round) => {
 }
 
 const generateRound = (teams) => {
-  const divisions = Object.keys(teams);
-  const schedules = divisions.reduce((scheduled, divisionName) => {
-    const pools = groupBy(teams[divisionName], 'pool');
+  const schedules = Object.keys(teams).reduce((scheduled, division) => {
+    const pools = groupBy(teams[division], 'pool');
     Object.entries(pools).forEach(([poolName, poolTeams]) => {
-      scheduled[divisionName + poolName] = robin(poolTeams.length, poolTeams);
+      scheduled[division + poolName] = robin(poolTeams.length, poolTeams);
     })
     // scheduled[divisionName] = robin(4, teams[divisionName])
     return scheduled;
