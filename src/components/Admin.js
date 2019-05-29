@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 
-import Permissions from 'state/permissions'
+import Permissions from '../state/permissions'
 import Generator from './Generator';
 import Menu from './Menu'
 import View from './View';

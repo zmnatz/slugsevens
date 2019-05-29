@@ -1,26 +1,28 @@
-import React, {useContext} from 'react';
-import { Menu } from 'semantic-ui-react';
-import firebase, {auth} from 'api/fire'
-import Permissions from 'state/permissions';
+import React, { useContext } from "react";
+import { Menu } from "semantic-ui-react";
+import firebase, { auth } from "../api/fire";
+import Permissions from "../state/permissions";
 
-function signIn () {
-  firebase.auth().signInWithPopup(auth)
+function signIn() {
+  firebase.auth().signInWithPopup(auth);
 }
 
-function signOut () {
+function signOut() {
   firebase.auth().signOut();
 }
 
 export default () => {
-  const {user} = useContext(Permissions);
+  const { user } = useContext(Permissions);
 
-  return <Menu>
-    <Menu.Menu position="right">{
-      user == null ?
-        <Menu.Item onClick={signIn}>Sign In</Menu.Item>
-        :
-        <Menu.Item onClick={signOut}>Sign Out</Menu.Item>
-    }
-    </Menu.Menu>
-  </Menu>
-}
+  return (
+    <Menu>
+      <Menu.Menu position="right">
+        {user == null ? (
+          <Menu.Item onClick={signIn}>Sign In</Menu.Item>
+        ) : (
+          <Menu.Item onClick={signOut}>Sign Out</Menu.Item>
+        )}
+      </Menu.Menu>
+    </Menu>
+  );
+};

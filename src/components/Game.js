@@ -2,42 +2,48 @@ import React, { useCallback, useContext } from "react";
 import { Form, Card, Label } from "semantic-ui-react";
 
 import Score from "./Score";
-import { handleFocus } from "utils";
-import useFirebase from 'hooks/useFirebase';
-import Permissions from 'state/permissions'
+import { handleFocus } from "../utils";
+import useFirebase from "../hooks/useFirebase";
+import Permissions from "../state/permissions";
 
-export default (props) => {
+export default props => {
   const game = useFirebase(`games/${props.id}`, null);
-  const {master, admin} = useContext(Permissions);
+  const { master, admin } = useContext(Permissions);
 
-  const onScoreChange = useCallback((e, { name, value }) => {
-    game.update({
-      inProgress: true,
-      complete: false,
-      score: {
-        ...game.data.score,
-        [name]: Number(value)
-      }
-    });
-  }, [game])
+  const onScoreChange = useCallback(
+    (e, { name, value }) => {
+      game.update({
+        inProgress: true,
+        complete: false,
+        score: {
+          ...game.data.score,
+          [name]: Number(value)
+        }
+      });
+    },
+    [game]
+  );
 
   const onScoreComplete = useCallback(() => {
     game.update({
       inProgress: false,
-      complete: true,
+      complete: true
     });
-  }, [game])
+  }, [game]);
 
-  const onChange = useCallback((e, {name, value}) => {
-    game.update({[name]: value})
-  }, [game])
+  const onChange = useCallback(
+    (e, { name, value }) => {
+      game.update({ [name]: value });
+    },
+    [game]
+  );
 
   const _fixScore = useCallback(() => {
     game.update({
       inProgress: true,
       complete: false
     });
-  }, [game])
+  }, [game]);
 
   const onDelete = useCallback(() => {
     game.remove();
@@ -46,17 +52,22 @@ export default (props) => {
   if (game.data == null) {
     return null;
   }
-  
-  const {score} = game.data;
+
+  const { score } = game.data;
 
   return (
     <Card>
       <Card.Content>
-        {master && 
-          <Label as="a" color="red" icon="delete" corner="right"
-            title="Delete Game" onClick={onDelete}
+        {master && (
+          <Label
+            as="a"
+            color="red"
+            icon="delete"
+            corner="right"
+            title="Delete Game"
+            onClick={onDelete}
           />
-        }
+        )}
         <Card.Header>
           {game.data.division}: Field {game.data.field} - {game.data.time}
         </Card.Header>
@@ -67,7 +78,8 @@ export default (props) => {
             <Form onSubmit={onScoreComplete}>
               {master && (
                 <Form.Group inline unstackable widths="equal">
-                  <Form.Input fluid
+                  <Form.Input
+                    fluid
                     type="number"
                     value={game.data.time}
                     label="Time"
@@ -75,7 +87,8 @@ export default (props) => {
                     onChange={onChange}
                     onFocus={handleFocus}
                   />
-                  <Form.Input fluid
+                  <Form.Input
+                    fluid
                     type="number"
                     value={game.data.field}
                     label="Field"
@@ -117,20 +130,25 @@ export default (props) => {
           )}
         </Card.Description>
       </Card.Content>
-      {admin && game.data.complete && 
+      {admin && game.data.complete && (
         <Card.Content extra>
           <Form.Button basic color="red" floated="right" onClick={_fixScore}>
             Fix Score
           </Form.Button>
         </Card.Content>
-      }
-      {admin && game.data.inProgress && 
+      )}
+      {admin && game.data.inProgress && (
         <Card.Content extra>
-          <Form.Button basic color="green" floated="right" onClick={onScoreComplete}>
+          <Form.Button
+            basic
+            color="green"
+            floated="right"
+            onClick={onScoreComplete}
+          >
             Finalize
           </Form.Button>
         </Card.Content>
-      }
+      )}
     </Card>
   );
-}
+};
