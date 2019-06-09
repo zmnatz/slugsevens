@@ -5,13 +5,13 @@ import TeamList from "./TeamList";
 import FilterMenu from "./FilterMenu";
 import Game from "./Game";
 
-import useQuery from "../hooks/useQuery";
 import { groupBy } from "../utils/";
+import ResultContext from "state/results";
 
 export default _ => {
+  const {games} = React.useContext(ResultContext)
   const [sidebar, setSidebar] = useState();
   const [selected, setSelected] = useState();
-  const games = useQuery("games");
 
   const toggleSidebar = useCallback(() => setSidebar(prev => !prev), [
     setSidebar

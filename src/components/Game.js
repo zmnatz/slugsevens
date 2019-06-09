@@ -58,7 +58,7 @@ export default props => {
   return (
     <Card>
       <Card.Content>
-        {master && (
+        {master && !game.data.complete && !game.data.inProgress && (
           <Label
             as="a"
             color="red"

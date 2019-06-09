@@ -6,7 +6,7 @@ import AddTeam from "./AddTeam";
 import Permissions from "../state/permissions";
 import { rankTeams, groupBy } from "../utils";
 
-const List = ({ teams }) => {
+const List = ({ teams=[] }) => {
   return Object.entries(groupBy(teams, "pool")).map(entry => (
     <div key={entry[0]}>
       <h4>Pool {entry[0]}</h4>

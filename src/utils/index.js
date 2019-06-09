@@ -25,13 +25,6 @@ export const rankTeams = (a, b) => {
     return diff;
   } else if (totalPoints !== 0) {
     return totalPoints;
-  // }  else {
-  //   const random = Math.random();
-  //   if (random >= .5) {
-  //     return 1;
-  //   } else {
-  //     return -1;
-  //   }
   }
   return 0;
 }
@@ -54,6 +47,23 @@ export const resetScore = (id, teams) => {
   }
 }
 
+export const determineWinner = game => {
+  if (game.score.home > game.score.away) {
+    return {
+      ...game,
+      winner: 'home',
+      loser: 'away'
+    }
+  } else if (game.score.away > game.score.home) {
+    return {
+      ...game,
+      winner: 'away',
+      loser: 'home'
+    }
+  }
+  return {...game}
+}
+
 export const determineOutcomes = (game, teams) => {
   if (!teams[game.home.id]) {
     teams = resetScore(game.home.id, teams);
@@ -68,19 +78,12 @@ export const determineOutcomes = (game, teams) => {
     home.pa += game.score.away;
     away.pf += game.score.away;
     away.pa += game.score.home;
-    if (game.score.home > game.score.away) {
-      home.wins++;
-      game.winner = 'home';
-      game.loser = 'away';
-      away.losses++;
-    } else if (game.score.away > game.score.home) {
-      home.losses++;
-      game.winner = 'away';
-      game.loser = 'home';
-      away.wins++;
+    if (game.winner && game.loser) {
+      teams[game[game.winner].id].wins++;
+      teams[game[game.loser].id].losses++
     } else {
       home.ties++;
-      away.ties++;
+      away.ties++
     }
   }
   return teams;

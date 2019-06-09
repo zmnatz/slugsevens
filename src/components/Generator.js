@@ -7,6 +7,7 @@ import { Button } from 'semantic-ui-react'
 import { groupBy } from '../utils';
 import ScheduleSettings from './ScheduleSettings';
 import useFirebase from '../hooks/useFirebase'
+import ResultContext from 'state/results';
 
 const checkRound = (i, schedule, round) => {
   if (round[i]) {
@@ -77,8 +78,9 @@ function resetSchedule (games) {
   );
 }
 
-export default ({teams}) => {
+export default () => {
   const {data: settings } = useFirebase('settings');
+  const {teams} = React.useContext(ResultContext)
 
   const groupedTeams = useMemo(
     () => groupBy(teams, 'division'),
