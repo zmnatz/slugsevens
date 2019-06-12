@@ -5,6 +5,7 @@ import View from "./components/View";
 import Registrations from "./components/Registrations";
 import { PermissionProvider } from "./state/permissions";
 import { ResultProvider } from "./state/results";
+import GameList from "components/GameList";
 
 const App = memo(() => {
   return (
@@ -12,6 +13,7 @@ const App = memo(() => {
       <ResultProvider>
         <Router>
           <Registrations path="/registrations" />
+          <GameList path="/gameManager"/>
           <View default />
         </Router>
       </ResultProvider>

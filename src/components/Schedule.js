@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Card, Segment, Sidebar } from "semantic-ui-react";
+import { Card, Segment, Sidebar, Header } from "semantic-ui-react";
 
 import TeamList from "./TeamList";
 import FilterMenu from "./FilterMenu";
@@ -41,13 +41,16 @@ export default _ => {
   const scores = useMemo(
     () =>
       Object.values(processedGroups).map(groupedGames => (
-        <Segment key={groupedGames[0].time}>
+        <React.Fragment key={groupedGames[0].time}>
+          <Header as="h3" dividing>
+            {groupedGames[0].time.substring(0,2)}:{groupedGames[0].time.substring(2,4)}
+          </Header>
           <Card.Group>
-            {groupedGames.map((game, index) => (
-              <Game key={game.id} id={game.id} />
+            {groupedGames.map(({id}, index) => (
+              <Game key={id+index} id={id} />
             ))}
           </Card.Group>
-        </Segment>
+        </React.Fragment>
       )),
     [processedGroups]
   );
@@ -65,7 +68,7 @@ export default _ => {
           <TeamList visible={sidebar} onSelect={setSelected} />
 
           <Sidebar.Pusher>
-            <Segment.Group style={{ minHeight: 300 }}>{scores}</Segment.Group>
+            <Segment basic style={{ minHeight: 300 }}>{scores}</Segment>
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </Segment>

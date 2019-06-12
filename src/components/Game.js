@@ -69,7 +69,8 @@ export default props => {
           />
         )}
         <Card.Header>
-          {game.data.division}: Field {game.data.field} - {game.data.time}
+          {game.data.name && <Label color={game.data.color} ribbon>{game.data.name}</Label>}
+          {game.data.division}: Field {game.data.field}
         </Card.Header>
         <Card.Description>
           {game.data.complete || !admin ? (

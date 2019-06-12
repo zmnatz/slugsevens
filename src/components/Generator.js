@@ -22,7 +22,6 @@ const generateRound = (divisions, teams) => {
     Object.entries(pools).forEach(([poolName, poolTeams]) => {
       scheduled[division + poolName] = robin(poolTeams.length, poolTeams);
     });
-    // scheduled[divisionName] = robin(4, teams[divisionName])
     return scheduled;
   }, {});
   const schedule = [];
@@ -32,7 +31,7 @@ const generateRound = (divisions, teams) => {
     gameCount = schedule.length;
     Object.values(schedules).forEach(checkRound.bind(this, i, schedule));
     i++;
-  } while (schedule.length > gameCount && i < 5);
+  } while (schedule.length > gameCount);
 
   return schedule.map(game => ({
     home: game[0],
@@ -40,6 +39,21 @@ const generateRound = (divisions, teams) => {
     division: game[0].division
   }));
 };
+
+function generatePlayoffs(divisions) {
+  const schedule = [[],[]]
+  const playoffs = divisions.reduce((schedule, division) => {
+    schedule[0] = [...schedule[0], 
+      {division, color: 'green', name: 'Semifinal', home: {name: '#1 Pool A'}, away: {name: '#2 Pool B'}},
+      {division, color: 'green', name: 'Semifinal', home: {name: '#1 Pool B'}, away: {name: '#1 Pool B'}},
+      {division, color: 'green', name: '5th Place', home: {name: '#3 Pool A'}, away: {name: '#3 Pool B'}},
+      {division, color: 'green', name: '7th Place', home: {name: '#4 Pool A'}, away: {name: '#4 Pool B'}}, 
+    ]
+    schedule[1] = [...schedule[1], {division, color: 'blue', name: 'Championship', home: {name: 'Finalist 1'}, away: {name: 'Finalist 2'}}]
+    return schedule;
+  }, schedule)
+  return [...playoffs[0], ...playoffs[1]];
+}
 
 function determineTime(round, settings) {
   const { increment, startTime } = settings;
@@ -85,7 +99,10 @@ export default () => {
   const groupedTeams = useMemo(() => groupBy(teams, "division"), [teams]);
 
   const onGenerate = useCallback(() => {
-    const games = [...generateRound(divisions, groupedTeams)];
+    const games = [
+      ...generateRound(divisions, groupedTeams),
+      ...generatePlayoffs(divisions)
+    ];
     const scheduledGames = setLocation(games, settings);
     const enrichedGames = scheduledGames.map(game => ({
       ...game,
