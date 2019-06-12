@@ -15,8 +15,8 @@ const checkRound = (i, schedule, round) => {
   }
 };
 
-const generateRound = teams => {
-  const schedules = Object.keys(teams).reduce((scheduled, division) => {
+const generateRound = (divisions, teams) => {
+  const schedules = divisions.reduce((scheduled, division) => {
     const pools = groupBy(teams[division], "pool");
     Object.entries(pools).forEach(([poolName, poolTeams]) => {
       scheduled[division + poolName] = robin(poolTeams.length, poolTeams);
@@ -78,12 +78,13 @@ function resetSchedule(games) {
 
 export default () => {
   const { data: settings } = useFirebase("settings");
+  const divisions = useFirebase("division");
   const { teams } = React.useContext(ResultContext);
 
   const groupedTeams = useMemo(() => groupBy(teams, "division"), [teams]);
 
   const onGenerate = useCallback(() => {
-    const games = [...generateRound(groupedTeams)];
+    const games = [...generateRound(divisions, groupedTeams)];
     const scheduledGames = setLocation(games, settings);
     const enrichedGames = scheduledGames.map(game => ({
       ...game,
