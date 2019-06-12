@@ -6,10 +6,10 @@ import FilterMenu from "./FilterMenu";
 import Game from "./Game";
 
 import { groupBy } from "../utils/";
-import ResultContext from "state/results";
+import ResultContext from "../state/results";
 
 export default _ => {
-  const {games} = React.useContext(ResultContext)
+  const { games } = React.useContext(ResultContext);
   const [sidebar, setSidebar] = useState();
   const [selected, setSelected] = useState();
 
@@ -21,23 +21,26 @@ export default _ => {
 
   const filteredGames = useMemo(
     () =>
-      games
-        .filter(
-          game =>
-            game != null &&
-            (selected == null ||
-              game.home.id === selected ||
-              game.away.id === selected)
-        )
-        .sort((a, b) => {
-          return (a.time + a.field).localeCompare(b.time + b.field);
-        }),
+      games.filter(
+        game =>
+          game != null &&
+          (selected == null ||
+            game.home.id === selected ||
+            game.away.id === selected)
+      ),
     [games, selected]
   );
 
+  const processedGroups = useMemo(() => {
+    const g = groupBy(filteredGames, "time");
+    const times = Object.keys(g);
+    times.sort((a, b) => Number(a) - Number(b));
+    return times.map(time => g[time]);
+  }, [filteredGames]);
+
   const scores = useMemo(
     () =>
-      Object.values(groupBy(filteredGames, "time")).map(groupedGames => (
+      Object.values(processedGroups).map(groupedGames => (
         <Segment key={groupedGames[0].time}>
           <Card.Group>
             {groupedGames.map((game, index) => (
@@ -46,7 +49,7 @@ export default _ => {
           </Card.Group>
         </Segment>
       )),
-    [filteredGames]
+    [processedGroups]
   );
 
   return useMemo(
