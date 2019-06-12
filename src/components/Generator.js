@@ -7,6 +7,7 @@ import { Button } from "semantic-ui-react";
 import { groupBy } from "../utils";
 import ScheduleSettings from "./ScheduleSettings";
 import useFirebase from "../hooks/useFirebase";
+import useQuery from "../hooks/useQuery";
 import ResultContext from "../state/results";
 
 const checkRound = (i, schedule, round) => {
@@ -78,7 +79,7 @@ function resetSchedule(games) {
 
 export default () => {
   const { data: settings } = useFirebase("settings");
-  const divisions = useFirebase("division");
+  const divisions = useQuery("division");
   const { teams } = React.useContext(ResultContext);
 
   const groupedTeams = useMemo(() => groupBy(teams, "division"), [teams]);
@@ -95,7 +96,7 @@ export default () => {
       complete: false
     }));
     resetSchedule(enrichedGames);
-  }, [settings, groupedTeams]);
+  }, [settings, groupedTeams, divisions]);
   return React.useMemo(
     () => (
       <div style={{ display: "flex" }}>
