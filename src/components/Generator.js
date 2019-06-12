@@ -79,7 +79,7 @@ function resetSchedule(games) {
 
 export default () => {
   const { data: settings } = useFirebase("settings");
-  const divisions = useQuery("division");
+  const divisions = useQuery("divisions");
   const { teams } = React.useContext(ResultContext);
 
   const groupedTeams = useMemo(() => groupBy(teams, "division"), [teams]);
