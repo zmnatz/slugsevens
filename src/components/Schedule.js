@@ -40,8 +40,9 @@ export default _ => {
 
   const scores = useMemo(
     () =>
-      Object.values(processedGroups).map(groupedGames => (
-        <React.Fragment key={groupedGames[0].time}>
+      Object.values(processedGroups).map(groupedGames => {
+        groupedGames.sort((a,b) => a.field - b.field)
+        return <React.Fragment key={groupedGames[0].time}>
           <Header as="h3" dividing>
             {groupedGames[0].time.substring(0,2)}:{groupedGames[0].time.substring(2,4)}
           </Header>
@@ -51,7 +52,7 @@ export default _ => {
             ))}
           </Card.Group>
         </React.Fragment>
-      )),
+      }),
     [processedGroups]
   );
 

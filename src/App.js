@@ -6,6 +6,7 @@ import Registrations from "./components/Registrations";
 import { PermissionProvider } from "./state/permissions";
 import { ResultProvider } from "./state/results";
 import GameList from "components/GameList";
+import TeamManager from "components/TeamManager";
 
 const App = memo(() => {
   return (
@@ -14,6 +15,7 @@ const App = memo(() => {
         <Router>
           <Registrations path="/registrations" />
           <GameList path="/gameManager"/>
+          <TeamManager path="/teamManager"/>
           <View default />
         </Router>
       </ResultProvider>

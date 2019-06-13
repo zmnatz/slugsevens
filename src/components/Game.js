@@ -56,7 +56,7 @@ export default props => {
   const { score } = game.data;
 
   return (
-    <Card>
+    <Card raised>
       <Card.Content>
         {master && !game.data.complete && !game.data.inProgress && (
           <Label

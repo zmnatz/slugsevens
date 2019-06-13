@@ -11,7 +11,7 @@ export default ({ visible, onSelect }) => {
     );
     return sorted.map(team => (
       <Menu.Item
-        key={team.name}
+        key={team.id}
         as="a"
         content={team.name}
         onClick={() => onSelect(team.id)}

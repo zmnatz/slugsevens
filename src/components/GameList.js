@@ -1,17 +1,26 @@
 import React from 'react';
-import useQuery from 'hooks/useQuery';
 import useFirebase from 'hooks/useFirebase'
 import { Table, Input } from 'semantic-ui-react';
+import fire from 'api/fire';
 
 const GameRow = React.memo(({id}) => {
   const game = useFirebase(`games/${id}`)
+  const homeTeam = useFirebase(`games/${id}/home`)
+  const awayTeam = useFirebase(`games/${id}/away`)
   const onChange = React.useCallback((e, {name, value}) => {
     game.update({[name]: value});
   }, [game])
-  const {home='', away='', time='', field='', referee='', division=''} = game.data;
+
+  const {time='', field='', referee='', division=''} = game.data;
   return React.useMemo(() => <Table.Row>
-    <Table.Cell width="five">{home && home.name}: {division}</Table.Cell>
-    <Table.Cell width="five">{away && away.name}: {division}</Table.Cell>
+    <Table.Cell>{id}</Table.Cell>
+    <Table.Cell>{division}</Table.Cell>
+    <Table.Cell width="five">
+      <Input name="home" value={homeTeam.data.name} onChange={(e, {value}) => homeTeam.update({name: value})}/>
+    </Table.Cell>
+    <Table.Cell width="five">
+      <Input value={awayTeam.data.name} onChange={(e, {value}) => awayTeam.update({name: value})}/>
+    </Table.Cell>
     <Table.Cell>
       <Input name="time" type="number" value={time} onChange={onChange}/>
     </Table.Cell>
@@ -22,17 +31,24 @@ const GameRow = React.memo(({id}) => {
       <Input name="referee" value={referee} onChange={onChange}/>
     </Table.Cell>
   </Table.Row>,
-  [home, away, time, field, referee, division, onChange]
+  [id, homeTeam, awayTeam, time, field, referee, division, onChange]
   )
 }) 
 
 export default () => {
-  const games = useQuery('games');
+  const [games, setGames] = React.useState([]);
+  React.useEffect(() => {
+    fire.database().ref('games').orderByChild('division').on('child_added', snapshot => {
+      setGames(prev => [...prev, {id: snapshot.key, ...snapshot.val()}])
+    })
+  }, [])
 
   return React.useMemo(() => {
-    return <Table columns={5} unstackable striped>
+    return <Table columns={7} unstackable striped>
       <Table.Header>
         <Table.Row>
+          <Table.HeaderCell>ID</Table.HeaderCell>
+          <Table.HeaderCell>Division</Table.HeaderCell>
         <Table.HeaderCell width="five">Home</Table.HeaderCell>
         <Table.HeaderCell width="five">Away</Table.HeaderCell>
         <Table.HeaderCell>Time</Table.HeaderCell>
