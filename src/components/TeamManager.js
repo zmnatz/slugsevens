@@ -17,6 +17,7 @@ const TeamRow = React.memo(({id, games, gameRef}) => {
     })
   }, [team, id, gameRef, games])
   return <Table.Row>
+    <Table.Cell>{id}</Table.Cell>
     <Table.Cell><Input value={team.data.name} onChange={onChange}/></Table.Cell>
     <Table.Cell>{team.data.division}</Table.Cell>
   </Table.Row>
@@ -30,6 +31,7 @@ export default () => {
   return <Table columns={2} unstackable striped>
     <Table.Header>
       <Table.Row>
+        <Table.HeaderCell>ID</Table.HeaderCell>
         <Table.HeaderCell width="five">Team</Table.HeaderCell>
         <Table.HeaderCell>Division</Table.HeaderCell>
       </Table.Row>
