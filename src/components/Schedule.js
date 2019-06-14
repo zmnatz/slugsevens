@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Card, Segment, Header, Button } from "semantic-ui-react";
+import { Segment, Button, Table } from "semantic-ui-react";
 
 import Game from "./Game";
 
@@ -33,16 +33,14 @@ export default _ => {
     () =>
       Object.values(processedGroups).map(groupedGames => {
         groupedGames.sort((a,b) => a.field - b.field)
-        return <React.Fragment key={groupedGames[0].time}>
-          <Header as="h3" dividing>
-            {groupedGames[0].time.substring(0,2)}:{groupedGames[0].time.substring(2,4)}
-          </Header>
-          <Card.Group>
-            {groupedGames.map(({id}, index) => (
-              <Game key={id+index} id={id} />
-            ))}
-          </Card.Group>
-        </React.Fragment>
+        return <Table.Row key={groupedGames[0].time}>
+          <Table.Cell>{groupedGames[0].time.substring(0,2)}:{groupedGames[0].time.substring(2,4)}</Table.Cell>
+          {groupedGames.map(({id}, index) => (
+            <Table.Cell key={id+index}>
+              <Game id={id} />
+            </Table.Cell>
+          ))}
+        </Table.Row>
       }),
     [processedGroups]
   );
@@ -59,7 +57,11 @@ export default _ => {
           </Button>
         )}
       </Segment>
-      <Segment basic style={{ minHeight: 300 }}>{scores}</Segment>
+      <Table>
+        <Table.Body>
+          {scores}
+        </Table.Body>
+      </Table>
     </React.Fragment>,
     [scores, selected, divisions]
   );
