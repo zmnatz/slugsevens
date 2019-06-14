@@ -11,7 +11,7 @@ const GameRow = React.memo(({id}) => {
     game.update({[name]: value});
   }, [game])
 
-  const {time='', field='', referee='', division=''} = game.data;
+  const {time='', field='', color='', division=''} = game.data;
   return React.useMemo(() => <Table.Row>
     <Table.Cell>{id}</Table.Cell>
     <Table.Cell>{division}</Table.Cell>
@@ -28,10 +28,10 @@ const GameRow = React.memo(({id}) => {
       <Input name="field" type="number" value={field} onChange={onChange}/>
     </Table.Cell>
     <Table.Cell>
-      <Input name="referee" value={referee} onChange={onChange}/>
+      <Input name="color" value={color} onChange={onChange}/>
     </Table.Cell>
   </Table.Row>,
-  [id, homeTeam, awayTeam, time, field, referee, division, onChange]
+  [id, homeTeam, awayTeam, time, field, color, division, onChange]
   )
 }) 
 
@@ -53,7 +53,7 @@ export default () => {
         <Table.HeaderCell width="five">Away</Table.HeaderCell>
         <Table.HeaderCell>Time</Table.HeaderCell>
         <Table.HeaderCell>Field</Table.HeaderCell>  
-        <Table.HeaderCell>Ref</Table.HeaderCell>
+        <Table.HeaderCell>Color</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
