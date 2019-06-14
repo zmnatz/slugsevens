@@ -1,8 +1,6 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { Card, Segment, Sidebar, Header, Button } from "semantic-ui-react";
+import React, { useMemo, useState } from "react";
+import { Card, Segment, Header, Button } from "semantic-ui-react";
 
-import TeamList from "./TeamList";
-import FilterMenu from "./FilterMenu";
 import Game from "./Game";
 
 import { groupBy } from "../utils/";
@@ -11,15 +9,8 @@ import useQuery from "hooks/useQuery";
 
 export default _ => {
   const { games } = React.useContext(ResultContext);
-  const [sidebar, setSidebar] = useState();
   const [selected, setSelected] = useState();
   const divisions = useQuery('divisions')
-
-  const toggleSidebar = useCallback(() => setSidebar(prev => !prev), [
-    setSidebar
-  ]);
-
-  const clearSelected = useCallback(() => setSelected(null), [setSelected]);
 
   const filteredGames = useMemo(
     () =>
@@ -62,7 +53,7 @@ export default _ => {
         {divisions.map(division => <Button 
           key={division}
           positive={selected === division} 
-          onClick={()=>setSelected(division)}
+          onClick={()=> setSelected(division === selected ? null : division)}
           >
             {division}
           </Button>
@@ -70,6 +61,6 @@ export default _ => {
       </Segment>
       <Segment basic style={{ minHeight: 300 }}>{scores}</Segment>
     </React.Fragment>,
-    [scores, sidebar, selected, clearSelected, toggleSidebar]
+    [scores, selected, divisions]
   );
 };
