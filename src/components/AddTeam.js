@@ -1,14 +1,14 @@
-import React, {useState, useCallback, useMemo} from 'react';
-import {Form} from 'semantic-ui-react'
+import React, { useState, useCallback } from 'react';
 import firebase from '../api/fire'
+import { TextField, Row, IconButton } from 'gestalt';
 
-const defaults = {name: '', pool: 'A'}
+const defaults = { name: '', pool: 'A' }
 
-export default ({division}) => {
+export default ({ division }) => {
   const [state, setState] = useState(defaults);
 
   const onChange = useCallback(
-    (e, {name, value}) => setState(prev => ({
+    ({ event: { target: { name } }, value }) => setState(prev => ({
       ...prev,
       [name]: value
     })),
@@ -26,18 +26,16 @@ export default ({division}) => {
     [division, state]
   )
 
-  return useMemo(() => {
-    const {name, pool} = state;
-    return <Form onSubmit={onSubmit}>
-      <Form.Input label="Team" name="name" 
-        value={name}
-        required onChange={onChange}
-      />
-      <Form.Input label="Pool" name="pool" 
-        value={pool} 
-        required onChange={onChange}
-      />
-      <Form.Button type='submit'>Add Team</Form.Button>
-    </Form>
-  }, [state, onChange, onSubmit])
+  return <form onSubmit={onSubmit}>
+    <Row gap={1}>
+      <h3>{division}</h3>
+      <IconButton accessibilityLabel="Add Team" icon="add" type="submit" />
+    </Row>
+    <Row gap={1}>
+      <TextField label="Team" id="name" name="name" value={state.name}
+        required onChange={onChange} />
+      <TextField label="Pool" id="pool" name="pool" value={state.pool}
+        required onChange={onChange} />
+    </Row>
+  </form>
 }

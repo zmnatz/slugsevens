@@ -29,8 +29,8 @@ export const rankTeams = (a, b) => {
   return 0;
 }
 
-export const handleFocus = ({target}) =>  {
-  target.select();
+export const handleFocus = ({event}) =>  {
+  event.target.select();
 }
 
 export const groupBy = function(xs, key) {

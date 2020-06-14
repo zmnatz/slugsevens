@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import fire from "../api/fire";
 
 const useQuery = (location, defaultValue = []) => {
@@ -18,12 +18,17 @@ const useQuery = (location, defaultValue = []) => {
     })
   }, [firebaseRef])
 
+  const update = useCallback((value) => {
+    setData(prev => ({...prev, value}));
+    firebaseRef.update(value);
+  }, [firebaseRef])
+
   return useMemo(() => ({
     ...firebaseRef,
     set: firebaseRef.set,
-    update: firebaseRef.update,
+    update,
     remove: firebaseRef.remove,
     data
-  }), [firebaseRef, data]);
+  }), [firebaseRef, data, update]);
 };
 export default useQuery;

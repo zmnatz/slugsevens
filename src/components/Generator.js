@@ -2,10 +2,9 @@ import React, { useMemo, useCallback } from "react";
 
 import fire from "../api/fire";
 import robin from "roundrobin";
-import { Button } from "semantic-ui-react";
+import { Button } from "gestalt";
 
 import { groupBy } from "../utils";
-import ScheduleSettings from "./ScheduleSettings";
 import useFirebase from "../hooks/useFirebase";
 import useQuery from "../hooks/useQuery";
 import ResultContext from "../state/results";
@@ -41,15 +40,15 @@ const generateRound = (divisions, teams) => {
 };
 
 function generatePlayoffs(divisions) {
-  const schedule = [[],[]]
+  const schedule = [[], []]
   const playoffs = divisions.reduce((schedule, division) => {
-    schedule[0] = [...schedule[0], 
-      {division, color: 'green', name: 'Semifinal', home: {name: '#1 Pool A'}, away: {name: '#2 Pool B'}},
-      {division, color: 'green', name: 'Semifinal', home: {name: '#1 Pool B'}, away: {name: '#1 Pool B'}},
-      {division, color: 'green', name: '5th Place', home: {name: '#3 Pool A'}, away: {name: '#3 Pool B'}},
-      {division, color: 'green', name: '7th Place', home: {name: '#4 Pool A'}, away: {name: '#4 Pool B'}}, 
+    schedule[0] = [...schedule[0],
+    { division, color: 'green', name: 'Semifinal', home: { name: '#1 Pool A' }, away: { name: '#2 Pool B' } },
+    { division, color: 'green', name: 'Semifinal', home: { name: '#1 Pool B' }, away: { name: '#1 Pool B' } },
+    { division, color: 'green', name: '5th Place', home: { name: '#3 Pool A' }, away: { name: '#3 Pool B' } },
+    { division, color: 'green', name: '7th Place', home: { name: '#4 Pool A' }, away: { name: '#4 Pool B' } },
     ]
-    schedule[1] = [...schedule[1], {division, color: 'blue', name: 'Championship', home: {name: 'Finalist 1'}, away: {name: 'Finalist 2'}}]
+    schedule[1] = [...schedule[1], { division, color: 'blue', name: 'Championship', home: { name: 'Finalist 1' }, away: { name: 'Finalist 2' } }]
     return schedule;
   }, schedule)
   return [...playoffs[0], ...playoffs[1]];
@@ -116,12 +115,7 @@ export default () => {
   }, [settings, groupedTeams, divisions]);
   return React.useMemo(
     () => (
-      <div style={{ display: "flex" }}>
-        <ScheduleSettings style={{ flex: 1 }} />
-        <Button type="primary" onClick={onGenerate}>
-          Generate
-        </Button>
-      </div>
+      <Button color="red" text="Generate" onClick={onGenerate} />
     ),
     [onGenerate]
   );

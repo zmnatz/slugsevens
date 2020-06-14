@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from "react";
-import { Grid, Button } from "semantic-ui-react";
+import { Table, Button } from "gestalt";
 import useQuery from "../hooks/useQuery";
 import useFirebase from "../hooks/useFirebase";
 
@@ -10,16 +10,16 @@ const RegistrationRow = ({ id }) => {
   const onDelete = useCallback(() => registration.remove(), [registration]);
 
   return (
-    <Grid.Row key={id}>
-      <Grid.Column>{team}</Grid.Column>
-      <Grid.Column>{email}</Grid.Column>
-      <Grid.Column>{division}</Grid.Column>
-      <Grid.Column>
+    <Table.Row key={id}>
+      <Table.Cell>{team}</Table.Cell>
+      <Table.Cell>{email}</Table.Cell>
+      <Table.Cell>{division}</Table.Cell>
+      <Table.Cell>
         <Button color="red" onClick={onDelete}>
           Delete
         </Button>
-      </Grid.Column>
-    </Grid.Row>
+      </Table.Cell>
+    </Table.Row>
   );
 };
 
@@ -28,19 +28,24 @@ export default _ => {
 
   return useMemo(
     () => (
-      <Grid celled columns="equal">
-        <Grid.Row>
-          <Grid.Column>Team</Grid.Column>
-          <Grid.Column>Email</Grid.Column>
-          <Grid.Column>Division</Grid.Column>
-          <Grid.Column>Delete</Grid.Column>
-        </Grid.Row>
-        {teams
-          .filter(({ deleted }) => !deleted)
-          .map(({ id }) => (
-            <RegistrationRow key={id} id={id} />
-          ))}
-      </Grid>
+      <Table>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Team</Table.HeaderCell>
+            <Table.HeaderCell>Email</Table.HeaderCell>
+            <Table.HeaderCell>Division</Table.HeaderCell>
+            <Table.HeaderCell>Delete</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body>
+          {teams
+            .filter(({ deleted }) => !deleted)
+            .map(({ id }) => (
+              <RegistrationRow key={id} id={id} />
+            ))}
+        </Table.Body>
+      </Table>
     ),
     [teams]
   );

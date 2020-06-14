@@ -1,5 +1,5 @@
 import React, { useCallback, useContext } from "react";
-import { Form, Card, Label, Table } from "semantic-ui-react";
+import { Heading, Table, TextField, Button, IconButton, Text } from 'gestalt'
 
 import Score from "./Score";
 import { handleFocus } from "../utils";
@@ -8,156 +8,129 @@ import Permissions from "../state/permissions";
 
 const FIELDS = ["Upper", "Middle", "Lower"];
 
-export default props => {
-  const game = useFirebase(`games/${props.id}`, null);
+export default ({ id }) => {
+  const { update, remove, data } = useFirebase(`games/${id}`, null);
   const { master, admin } = useContext(Permissions);
 
   const onScoreChange = useCallback(
-    (e, { name, value }) => {
-      game.update({
+    ({ event, value }) => {
+      update({
         inProgress: true,
         complete: false,
         score: {
-          ...game.data.score,
-          [name]: Number(value)
+          ...data.score,
+          [event.target.name]: Number(value)
         }
       });
     },
-    [game]
+    [data, update]
   );
 
   const onScoreComplete = useCallback(() => {
-    game.update({
+    update({
       inProgress: false,
       complete: true
     });
-  }, [game]);
+  }, [update]);
 
   const onChange = useCallback(
-    (e, { name, value }) => {
-      game.update({ [name]: value });
+    ({ event, value }) => {
+      update({ [event.target.name]: value });
     },
-    [game]
+    [update]
   );
 
   const _fixScore = useCallback(() => {
-    game.update({
+    update({
       inProgress: true,
       complete: false
     });
-  }, [game]);
+  }, [update]);
 
-  const onDelete = useCallback(() => {
-    game.remove();
-  }, [game]);
-
-  if (game.data == null) {
+  if (data == null) {
     return null;
   }
 
-  const { score } = game.data;
+  const { score } = data;
 
   return (
     <Table.Cell>
-      <Card raised fluid>
-        <Card.Content>
-          {game.data.name && (
-            <Label color={game.data.color} attached="top">
-              {game.data.name}
-            </Label>
-          )}
-          {master && !game.data.complete && !game.data.inProgress && (
-            <Label
-              as="a"
-              color="red"
-              icon="delete"
-              corner="right"
-              title="Delete Game"
-              onClick={onDelete}
-            />
-          )}
-          <Card.Header>
-            {game.data.division}: {FIELDS[game.data.field - 1]} Field
-          </Card.Header>
-          <Card.Description>
-            {game.data.complete || !admin ? (
-              <Score game={game.data} />
-            ) : (
-              <Form onSubmit={onScoreComplete}>
-                {master && (
-                  <Form.Group inline unstackable widths="equal">
-                    <Form.Input
-                      fluid
-                      type="number"
-                      value={game.data.time}
-                      label="Time"
-                      name="time"
-                      onChange={onChange}
-                      onFocus={handleFocus}
-                    />
-                    <Form.Input
-                      fluid
-                      type="number"
-                      value={game.data.field}
-                      label="Field"
-                      name="field"
-                      onChange={onChange}
-                      onFocus={handleFocus}
-                    />
-                  </Form.Group>
-                )}
-                <Form.Group widths="equal" inline unstackable>
-                  <Form.Input
-                    fluid
-                    type="number"
-                    name="away"
-                    value={score.away}
-                    label={game.data.away.name}
-                    onChange={onScoreChange}
-                    onFocus={handleFocus}
-                  />
-                  <Form.Input
-                    fluid
-                    type="number"
-                    name="home"
-                    value={score.home}
-                    label={game.data.home.name}
-                    onChange={onScoreChange}
-                    onFocus={handleFocus}
-                  />
-                </Form.Group>
-                <Form.Input
-                  inline
-                  value={game.data.referee}
-                  label="Referee"
-                  name="referee"
-                  onChange={onChange}
-                  onFocus={handleFocus}
-                />
-              </Form>
-            )}
-          </Card.Description>
-        </Card.Content>
-        {admin && game.data.complete && (
-          <Card.Content extra>
-            <Form.Button basic color="red" floated="right" onClick={_fixScore}>
-              Fix Score
-            </Form.Button>
-          </Card.Content>
-        )}
-        {admin && game.data.inProgress && (
-          <Card.Content extra>
-            <Form.Button
-              basic
-              color="green"
-              floated="right"
-              onClick={onScoreComplete}
-            >
-              Finalize
-            </Form.Button>
-          </Card.Content>
-        )}
-      </Card>
+      {data.name && (
+        <Heading attached="top">
+          {data.name}
+        </Heading>
+      )}
+      {master && admin && !data.complete && !data.inProgress && (
+        <IconButton icon="cancel" onClick={() => remove()} iconColor='red' accessibilityLabel="Delete Game" />
+      )}
+      <Heading size="sm">
+        {data.division}: {FIELDS[data.field - 1]} Field
+      </Heading>
+      {data.away.name === 'Bye' && data.home.name === 'Bye' && <Text>Bye</Text>}
+      {(data.complete || !admin) && data.away.name !== 'Bye' && data.home.name !== 'Bye' &&
+        <Score game={data} />
+      }
+      {!data.complete && admin && data.away.name !== 'Bye' && data.home.name !== 'Bye' &&
+        <form onSubmit={onScoreComplete}>
+          {master && <TextField
+            type="number"
+            value={String(data.time)}
+            label="Time"
+            name="time"
+            id={`${id}time`}
+            onChange={onChange}
+            onFocus={handleFocus}
+          />}
+          {master &&
+            <TextField
+              type="number"
+              value={String(data.field)}
+              label="Field"
+              name="field"
+              id={`${id}field`}
+              onChange={onChange}
+              onFocus={handleFocus}
+            />}
+          <TextField
+            id={`${id}away`}
+            type="number"
+            name="away"
+            value={String(score.away)}
+            label={data.away.name}
+            onChange={onScoreChange}
+            onFocus={handleFocus}
+          />
+          <TextField
+            fluid
+            type="number"
+            name="home"
+            id={`${id}home`}
+            value={String(score.home)}
+            label={data.home.name}
+            onChange={onScoreChange}
+            onFocus={handleFocus}
+          />
+          <TextField
+            id={`${id}referee`}
+            value={data.referee}
+            label="Referee"
+            name="referee"
+            onChange={onChange}
+            onFocus={handleFocus}
+          />
+        </form>
+      }
+      {admin && data.complete && (
+        <Button color="red" floated="right" onClick={_fixScore} text="Fix Score" />
+      )}
+      {admin && data.inProgress && (
+        <Button
+          color="blue"
+          floated="right"
+          onClick={onScoreComplete}
+          text="Finalize"
+        />
+      )}
     </Table.Cell>
   );
 };

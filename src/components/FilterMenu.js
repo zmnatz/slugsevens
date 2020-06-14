@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "semantic-ui-react";
+import { Button } from "gestalt";
 import useFirebase from "../hooks/useFirebase";
 
 export default ({ filter, onToggle, visible, clearSelected }) => {

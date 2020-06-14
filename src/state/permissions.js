@@ -41,7 +41,7 @@ const PermissionComponent = ({ children }) => {
 
   return useMemo(
     () => (
-      <PermissionContext.Provider value={{ user, admin, master, setAdmin }}>
+      <PermissionContext.Provider value={{ user, admin, master: master && admin, setAdmin }}>
         {children}
       </PermissionContext.Provider>
     ),
