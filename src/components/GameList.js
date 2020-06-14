@@ -18,22 +18,22 @@ const GameRow = memo(({ id }) => {
       <Table.Cell>{division}</Table.Cell>
       <Table.Cell width="five">
         <TextField
-          id="home" name="home"
-          value={homeTeam.data.name}
-          onChange={(e, { value }) => homeTeam.update({ name: value })}
+          id={`${id}home`}
+          value={homeTeam.data.name || ''}
+          onChange={({ value }) => homeTeam.update({ name: value })}
         />
       </Table.Cell>
       <Table.Cell width="five">
-        <TextField
-          value={awayTeam.data.name}
-          onChange={(e, { value }) => awayTeam.update({ name: value })}
+        <TextField id={`${id}away`} 
+          value={awayTeam.data.name || ''}
+          onChange={({ value }) => awayTeam.update({ name: value })}
         />
       </Table.Cell>
       <Table.Cell>
         <TextField id="time" name="time" type="number" value={time} onChange={onChange} />
       </Table.Cell>
       <Table.Cell>
-        <TextField id="field" name="field" type="number" value={field} onChange={onChange} />
+        <TextField id="field" name="field" type="number" value={String(field)} onChange={onChange} />
       </Table.Cell>
       <Table.Cell>
         <TextField id="color" name="color" value={color} onChange={onChange} />
