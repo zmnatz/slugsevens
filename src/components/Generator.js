@@ -5,9 +5,7 @@ import robin from "roundrobin";
 import { Button } from "gestalt";
 
 import { groupBy } from "../utils";
-import useFirebase from "../hooks/useFirebase";
 import useQuery from "../hooks/useQuery";
-import ResultContext from "../state/results";
 
 const checkRound = (i, schedule, round) => {
   if (round[i]) {
@@ -91,9 +89,9 @@ function resetSchedule(games) {
 }
 
 export default () => {
-  const { data: settings } = useFirebase("settings");
+  const settings = useQuery("settings");
   const divisions = useQuery("divisions");
-  const { teams } = React.useContext(ResultContext);
+  const teams = useQuery('teams')
 
   const groupedTeams = useMemo(() => groupBy(teams, "division"), [teams]);
 

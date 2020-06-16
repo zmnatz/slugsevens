@@ -7,13 +7,15 @@ import Permissions from "../state/permissions";
 import { rankTeams, groupBy } from "../utils";
 
 const List = ({ teams = [] }) => {
+  const {master} = useContext(Permissions);
   return Object.entries(groupBy(teams, "pool")).map(entry => (
     <div key={entry[0]}>
       <h4>Pool {entry[0]}</h4>
       <Table borderSize="sm" HeaderCells="equal">
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell width={6}>Team</Table.HeaderCell>
+            {master && <Table.HeaderCell></Table.HeaderCell>}
+            <Table.HeaderCell width={5}>Team</Table.HeaderCell>
             <Table.HeaderCell>W</Table.HeaderCell>
             <Table.HeaderCell>L</Table.HeaderCell>
             <Table.HeaderCell>T</Table.HeaderCell>

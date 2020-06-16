@@ -1,5 +1,6 @@
-import React from "react";
-import { Row, Heading } from "gestalt";
+import React, { useContext } from "react";
+import { Row, Heading, IconButton } from "gestalt";
+import Permissions from "../state/permissions";
 
 const TeamScore = ({ name, score = 0 }) => (
   <Row>
@@ -8,7 +9,13 @@ const TeamScore = ({ name, score = 0 }) => (
   </Row >
 );
 
-export default ({ game }) => {
+export default ({ game, onEdit }) => {
+  const { admin } = useContext(Permissions);
+
+  if (game?.home?.name === 'Bye' && game?.away?.name === 'Bye') {
+    return 'Bye';
+  }
+  
   return (<React.Fragment>
     {
       game?.referee?.length > 0 && (
@@ -17,5 +24,12 @@ export default ({ game }) => {
     }
     <TeamScore name={game?.away?.name} score={game?.score?.away} />
     <TeamScore name={game?.home?.name} score={game?.score?.home} />
+    {admin &&
+      <Row justifyContent="end">
+        <IconButton icon="edit" iconColor="red" bgColor="lightGray"
+          accessibilityLabel="Fix Score" text="Fix" onClick={onEdit}
+        />
+      </Row>
+    }
   </React.Fragment>);
 };

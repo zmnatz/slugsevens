@@ -7,6 +7,7 @@ const useQuery = (location, defaultValue = []) => {
     () => fire.database().ref(location),
     [location]
   );
+
   useEffect(() => {
     firebaseRef.on("value", snapshot => {
       const value = snapshot.val()
@@ -19,7 +20,7 @@ const useQuery = (location, defaultValue = []) => {
   }, [firebaseRef])
 
   const update = useCallback((value) => {
-    setData(prev => ({...prev, value}));
+    setData(prev => ({ ...prev, value }));
     firebaseRef.update(value);
   }, [firebaseRef])
 

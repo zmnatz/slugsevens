@@ -13,12 +13,11 @@ import { Tabs, Container } from "gestalt";
 export default () => {
   const [active, setActive] = useState(0);
   const divisions = useQuery("divisions");
-  const { teams } = useContext(ResultContext);
+  const teams = useContext(ResultContext);
   const groupedTeams = useMemo(() => groupBy(teams, "division"), [teams]);
 
   const activeDivision = active > 0 && divisions[active - 1];
   const handleChange = useCallback(({ activeTabIndex }) => setActive(activeTabIndex), [])
-
   return <React.Fragment>
     <Router>
       <Admin path="admin/*" />
@@ -29,7 +28,9 @@ export default () => {
         ...divisions.map(text => ({ text }))]}
       />
       <Container>
-        {activeDivision === false && <Schedule />}
+        <span style={{display: activeDivision === false ? 'block' : 'none'}}>
+          <Schedule />
+        </span>
         {activeDivision !== false &&
           <Teams division={activeDivision} teams={groupedTeams[activeDivision]} />
         }

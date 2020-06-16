@@ -1,5 +1,5 @@
-import React, { useCallback, useContext } from "react";
-import { Heading, Table, TextField, Button, IconButton, Text } from 'gestalt'
+import React, { useCallback, useContext, useMemo } from "react";
+import { Heading, TextField, Button, IconButton, Box, Row } from 'gestalt'
 
 import Score from "./Score";
 import { handleFocus } from "../utils";
@@ -8,13 +8,13 @@ import Permissions from "../state/permissions";
 
 const FIELDS = ["Upper", "Middle", "Lower"];
 
-export default ({ id }) => {
-  const { update, remove, data } = useFirebase(`games/${id}`, null);
-  const { master, admin } = useContext(Permissions);
-
-  const onScoreChange = useCallback(
-    ({ event, value }) => {
-      update({
+const ScoreForm = ({ data, onUpdate }) => {
+  const {onChange, onScoreChange, onScoreComplete} = useMemo(() => ({
+    onChange: ({ event, value }) => {
+      onUpdate({ [event.target.name]: value });
+    },
+    onScoreChange: ({ event, value }) => {
+      onUpdate({
         inProgress: true,
         complete: false,
         score: {
@@ -23,24 +23,80 @@ export default ({ id }) => {
         }
       });
     },
-    [data, update]
-  );
+    onScoreComplete: () => {
+      onUpdate({
+        inProgress: false,
+        complete: true
+      });
+    } 
+  }), [onUpdate, data.score])
 
-  const onScoreComplete = useCallback(() => {
-    update({
-      inProgress: false,
-      complete: true
-    });
-  }, [update]);
+  const { master } = useContext(Permissions);
+  const {id, score} = data;
 
-  const onChange = useCallback(
-    ({ event, value }) => {
-      update({ [event.target.name]: value });
-    },
-    [update]
-  );
+  return <form onSubmit={onScoreComplete}>
+    {master && <TextField
+      type="number"
+      value={String(data.time)}
+      label="Time"
+      name="time"
+      id={`${id}time`}
+      onChange={onChange}
+      onFocus={handleFocus}
+    />}
+    {master &&
+      <TextField
+        type="number"
+        value={String(data.field)}
+        label="Field"
+        name="field"
+        id={`${id}field`}
+        onChange={onChange}
+        onFocus={handleFocus}
+      />}
+    <TextField
+      id={`${id}away`}
+      type="number"
+      name="away"
+      value={String(score.away)}
+      label={data.away.name}
+      onChange={onScoreChange}
+      onFocus={handleFocus}
+    />
+    <TextField
+      fluid
+      type="number"
+      name="home"
+      id={`${id}home`}
+      value={String(score.home)}
+      label={data.home.name}
+      onChange={onScoreChange}
+      onFocus={handleFocus}
+    />
+    <TextField
+      id={`${id}referee`}
+      value={data.referee}
+      label="Referee"
+      name="referee"
+      onChange={onChange}
+      onFocus={handleFocus}
+    />
+    {data.inProgress && (
+      <Button
+        color="blue"
+        floated="right"
+        onClick={onScoreComplete}
+        text="Finalize"
+      />
+    )}
+  </form>
+}
 
-  const _fixScore = useCallback(() => {
+export default ({ id }) => {
+  const { update, remove, data } = useFirebase(`games/${id}`, null);
+  const { master, admin } = useContext(Permissions);
+
+  const handleEdit = useCallback(() => {
     update({
       inProgress: true,
       complete: false
@@ -51,86 +107,29 @@ export default ({ id }) => {
     return null;
   }
 
-  const { score } = data;
-
   return (
-    <Table.Cell>
+    <Box width={235} smMarginBottom={3}>
       {data.name && (
         <Heading attached="top">
           {data.name}
         </Heading>
       )}
-      {master && admin && !data.complete && !data.inProgress && (
-        <IconButton icon="cancel" onClick={() => remove()} iconColor='red' accessibilityLabel="Delete Game" />
-      )}
-      <Heading size="sm">
-        {data.division}: {FIELDS[data.field - 1]} Field
-      </Heading>
-      {data.away.name === 'Bye' && data.home.name === 'Bye' && <Text>Bye</Text>}
-      {(data.complete || !admin) && data.away.name !== 'Bye' && data.home.name !== 'Bye' &&
-        <Score game={data} />
+      <Row justifyContent="between">
+        <Heading size="sm">
+          {data.division}: {FIELDS[data.field - 1]} Field
+        </Heading>
+      </Row>
+      {(!admin || !data.inProgress) && 
+        <Score game={data} onEdit={handleEdit}/>
       }
       {!data.complete && admin && data.away.name !== 'Bye' && data.home.name !== 'Bye' &&
-        <form onSubmit={onScoreComplete}>
-          {master && <TextField
-            type="number"
-            value={String(data.time)}
-            label="Time"
-            name="time"
-            id={`${id}time`}
-            onChange={onChange}
-            onFocus={handleFocus}
-          />}
-          {master &&
-            <TextField
-              type="number"
-              value={String(data.field)}
-              label="Field"
-              name="field"
-              id={`${id}field`}
-              onChange={onChange}
-              onFocus={handleFocus}
-            />}
-          <TextField
-            id={`${id}away`}
-            type="number"
-            name="away"
-            value={String(score.away)}
-            label={data.away.name}
-            onChange={onScoreChange}
-            onFocus={handleFocus}
-          />
-          <TextField
-            fluid
-            type="number"
-            name="home"
-            id={`${id}home`}
-            value={String(score.home)}
-            label={data.home.name}
-            onChange={onScoreChange}
-            onFocus={handleFocus}
-          />
-          <TextField
-            id={`${id}referee`}
-            value={data.referee}
-            label="Referee"
-            name="referee"
-            onChange={onChange}
-            onFocus={handleFocus}
-          />
-        </form>
+        <ScoreForm data={data} onUpdate={update}/>
       }
-      {admin && data.complete && (
-        <Button color="red" floated="right" onClick={_fixScore} text="Fix Score" />
-      )}
-      {admin && data.inProgress && (
-        <Button
-          color="blue"
-          floated="right"
-          onClick={onScoreComplete}
-          text="Finalize"
-        />
-      )}
-    </Table.Cell>
+      {admin && <Row justifyContent="end">
+        {master && !data.complete && !data.inProgress && (
+          <IconButton icon="cancel" onClick={() => remove()} iconColor='red' accessibilityLabel="Delete Game" />
+        )}
+      </Row>}
+    </Box>
   );
 };

@@ -18,7 +18,7 @@ export default () => {
   return useMemo(() => {
     const { numFields = 3, increment = 20, startTime = 900 } = settings.data;
     return (
-      <Row>
+      <Row wrap>
         <Label htmlFor="numFields">
           <Text>Fields</Text>
         </Label>
