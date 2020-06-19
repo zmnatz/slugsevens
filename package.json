@@ -11,9 +11,9 @@
     "firebase-app": "0.0.1",
     "firebase-auth": "^0.1.2",
     "gestalt": "^2.3.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "^3.0.1",
     "roundrobin": "1.0.3"
   },
   "scripts": {
