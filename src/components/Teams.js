@@ -1,44 +1,38 @@
 import React, { useContext } from "react";
-import { Table } from "gestalt";
+import { Grid } from "semantic-ui-react";
 import Team from "./Team";
 import AddTeam from "./AddTeam";
 
 import Permissions from "../state/permissions";
 import { rankTeams, groupBy } from "../utils";
 
-const List = ({ teams = [] }) => {
-  const {master} = useContext(Permissions);
+const List = ({ teams=[] }) => {
   return Object.entries(groupBy(teams, "pool")).map(entry => (
     <div key={entry[0]}>
       <h4>Pool {entry[0]}</h4>
-      <Table borderSize="sm" HeaderCells="equal">
-        <Table.Header>
-          <Table.Row>
-            {master && <Table.HeaderCell></Table.HeaderCell>}
-            <Table.HeaderCell width={5}>Team</Table.HeaderCell>
-            <Table.HeaderCell>W</Table.HeaderCell>
-            <Table.HeaderCell>L</Table.HeaderCell>
-            <Table.HeaderCell>T</Table.HeaderCell>
-            <Table.HeaderCell>PF</Table.HeaderCell>
-            <Table.HeaderCell>PA</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {entry[1].sort(rankTeams).map(team => (
-            <Team key={team.id} team={team} />
-          ))}
-        </Table.Body>
-      </Table>
+      <Grid celled columns="equal">
+        <Grid.Row>
+          <Grid.Column width={6}>Team</Grid.Column>
+          <Grid.Column>W</Grid.Column>
+          <Grid.Column>L</Grid.Column>
+          <Grid.Column>T</Grid.Column>
+          <Grid.Column>PF</Grid.Column>
+          <Grid.Column>PA</Grid.Column>
+        </Grid.Row>
+        {entry[1].sort(rankTeams).map(team => (
+          <Team key={team.id} team={team} />
+        ))}
+      </Grid>
     </div>
   ));
 };
 
 export default ({ teams, division }) => {
-  const { master, admin } = useContext(Permissions);
+  const { master } = useContext(Permissions);
   return (
     <div>
-      {!master && <h3>{division}</h3>}
-      {master && admin && <AddTeam division={division} />}
+      <h3>{division}</h3>
+      {master && <AddTeam division={division} />}
       <List teams={teams} />
     </div>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 import useQuery from "../hooks/useQuery";
 import useFirebase from "../hooks/useFirebase";
-import { Table, TextField } from "gestalt";
+import { Table, Input } from "semantic-ui-react";
 import fire from "../api/fire";
 
 const TeamRow = React.memo(({ id, games, gameRef }) => {
@@ -19,14 +19,11 @@ const TeamRow = React.memo(({ id, games, gameRef }) => {
     },
     [team, id, gameRef, games]
   );
-
-  const {name = ''} = team.data;
-
   return (
     <Table.Row>
       <Table.Cell>{id}</Table.Cell>
       <Table.Cell>
-        <TextField id={id} value={name} onChange={onChange} />
+        <Input value={team.data.name} onChange={onChange} />
       </Table.Cell>
       <Table.Cell>{team.data.division}</Table.Cell>
     </Table.Row>
@@ -39,7 +36,7 @@ export default () => {
   const gameRef = fire.database();
 
   return (
-    <Table>
+    <Table columns={2} unstackable striped>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>ID</Table.HeaderCell>

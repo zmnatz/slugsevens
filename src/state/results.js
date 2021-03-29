@@ -1,86 +1,101 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import fire from "../api/fire";
 
+import { SCORE_DEFAULTS, determineOutcomes, reverseOutcome, determineWinner } from "../utils";
+
 const DEFAULT_TEAMS = []
-const ResultContext = React.createContext(DEFAULT_TEAMS)
+const DEFAULT_GAMES = [];
 
-function populateTeam(id, team) {
-  return {
-    ...team,
-    id,
-    wins: 0,
-    losses: 0,
-    ties: 0,
-    pf: 0,
-    pa: 0
-  }
-}
+const ResultContext = React.createContext({
+  teams: DEFAULT_TEAMS,
+  games: DEFAULT_GAMES
+})
 
-function addResults(r, game, teams) {
-  const home = r[game.home.id] || { ...teams[game.home.id] };
-  const away = r[game.away.id] || { ...teams[game.away.id] };
-  home.pf += game.score.home;
-  home.pa += game.score.away;
-  away.pf += game.score.away;
-  away.pa += game.score.home;
-
-  if (game.score.home > game.score.away) {
-    home.wins++;
-    away.losses++;
-  } else if (game.score.away > game.score.home) {
-    home.losses++;
-    away.wins++;
-  } else {
-    home.ties++;
-    away.ties++;
-  }
-  return [home, away];
-}
-
-function processResults (teams, games) {
-  const results = Object.values(games).reduce((r, game) => {
-    const [home, away] = addResults(r, game, teams);
-    r[game.home.id] = home;
-    r[game.away.id] = away;
-    return r;
-  }, {})
-  return Object.values(results);
-}
-
-const ResultProvider = ({ children }) => {
-  const [teams, setTeams] = useState();
-  const [results, setResults] = useState(DEFAULT_TEAMS);
+const ResultProvider = ({children}) => {
+  const [teams, setTeams] = useState(DEFAULT_TEAMS);
+  const [games, setGames] = useState(DEFAULT_GAMES);
 
   useEffect(() => {
-    const firebaseTeams = fire.database().ref('teams').orderByKey();
-    firebaseTeams.on('value', snapshot => {
-      const teams = snapshot.val();
-      setTeams(Object.keys(teams).reduce((r, id) => {
-        r[id] = populateTeam(id, teams[id]);
-        return r;
-      }, {}));
-      return () => firebaseTeams.off('value');
-    }, []);
-    return () => firebaseTeams.off('value');
-  }, []);
+    let teamsRef = fire.database().ref("teams").orderByKey();
+    teamsRef.on("child_added", snapshot => 
+      setTeams(prev => {
+        const prevTeam = prev[snapshot.key] || SCORE_DEFAULTS;
+        let team = {
+          ...prevTeam,
+          ...snapshot.val(),
+          id: snapshot.key
+        };
+        return {
+          ...prev, 
+          [team.id]: team
+        };
+      })
+    );
 
+    teamsRef.on("child_removed", snapshot =>
+      setTeams(prev => ({
+        ...prev,
+        [snapshot.key]: undefined
+      }))
+    );
+    return () => {
+      teamsRef.off('child_added');
+      teamsRef.off('child_removed')
+    }
+  }, [])
+  
   useEffect(() => {
-    const firebaseGames = fire.database().ref('games')
-      .orderByChild('complete').equalTo(true);
-    firebaseGames.on('value', snapshot => {
-      if (teams == null) {
-        return;
+    let gamesRef = fire.database().ref("games").orderByKey();
+    gamesRef.on("child_added", snapshot => {
+      const game = { ...snapshot.val(), id: snapshot.key };
+      setGames(prev => ({
+        ...prev,
+        [game.id]: game
+      }));
+
+      if (game.complete) {
+        setTeams(teams => determineOutcomes(game, teams));
       }
-      setResults(processResults(teams, snapshot.val()));
     });
-    return () => firebaseGames.off('value');
-  }, [teams]);
 
-  return <ResultContext.Provider value={results}>
-    {children}
-  </ResultContext.Provider>;
+    gamesRef.on("child_removed", snapshot => {
+      setGames(prev => ({
+        ...prev,
+          [snapshot.key]: undefined
+      }));
+    });
+
+
+    gamesRef.on("child_changed", snapshot => {
+      const game = determineWinner(snapshot.val());
+      let outcomeChanged;
+      setGames(games => {
+        outcomeChanged = !game.complete && games[game.id] && games[game.id].complete;
+        return {...games, [game.id]: game};
+      })
+      if (game.complete) {
+        setTeams(teams => determineOutcomes(game, teams));
+      } else if (outcomeChanged) {
+        setTeams(teams => reverseOutcome(game, teams));
+      }
+    });
+
+    return () => {
+      gamesRef.off('child_added');
+      gamesRef.off('child_removed');
+      gamesRef.off('child_changed');
+    }
+  }, [])
+
+  const filteredTeams = useMemo(() => Object.values(teams).filter(team => team), [teams]);
+
+  return useMemo(() => (
+    <ResultContext.Provider value={{teams: filteredTeams, games: Object.values(games)}}>
+      {children}
+    </ResultContext.Provider> 
+  ), [filteredTeams, games, children])
 }
 
-const ResultConsumer = ResultContext.Consumer;
-export { ResultProvider, ResultConsumer };
+const ResultConsumer = ResultContext.Consumer
+export { ResultProvider,  ResultConsumer};
 export default ResultContext;

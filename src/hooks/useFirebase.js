@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import fire from "../api/fire";
 
 const useQuery = (location, defaultValue = []) => {
@@ -7,7 +7,6 @@ const useQuery = (location, defaultValue = []) => {
     () => fire.database().ref(location),
     [location]
   );
-
   useEffect(() => {
     firebaseRef.on("value", snapshot => {
       const value = snapshot.val()
@@ -19,17 +18,12 @@ const useQuery = (location, defaultValue = []) => {
     })
   }, [firebaseRef])
 
-  const update = useCallback((value) => {
-    setData(prev => ({ ...prev, value }));
-    firebaseRef.update(value);
-  }, [firebaseRef])
-
   return useMemo(() => ({
     ...firebaseRef,
     set: firebaseRef.set,
-    update,
+    update: firebaseRef.update,
     remove: firebaseRef.remove,
     data
-  }), [firebaseRef, data, update]);
+  }), [firebaseRef, data]);
 };
 export default useQuery;

@@ -1,50 +1,56 @@
-import React, { memo, useCallback, useMemo, useState, useEffect } from "react";
+import React from "react";
 import useFirebase from "../hooks/useFirebase";
-import { Table, TextField } from "gestalt";
+import { Table, Input } from "semantic-ui-react";
 import fire from "../api/fire";
 
-const GameRow = memo(({ id }) => {
+const GameRow = React.memo(({ id }) => {
   const game = useFirebase(`games/${id}`);
   const homeTeam = useFirebase(`games/${id}/home`);
   const awayTeam = useFirebase(`games/${id}/away`);
-  const onChange = useCallback(({ event, value }) => {
-    game.update({ [event.target.name]: value });
-  }, [game]);
+  const onChange = React.useCallback(
+    (e, { name, value }) => {
+      game.update({ [name]: value });
+    },
+    [game]
+  );
 
   const { time = "", field = "", color = "", division = "" } = game.data;
-  return useMemo(() => (
-    <Table.Row>
-      <Table.Cell>{id}</Table.Cell>
-      <Table.Cell>{division}</Table.Cell>
-      <Table.Cell width="five">
-        <TextField
-          id={`${id}home`}
-          value={homeTeam.data.name || ''}
-          onChange={({ value }) => homeTeam.update({ name: value })}
-        />
-      </Table.Cell>
-      <Table.Cell width="five">
-        <TextField id={`${id}away`} 
-          value={awayTeam.data.name || ''}
-          onChange={({ value }) => awayTeam.update({ name: value })}
-        />
-      </Table.Cell>
-      <Table.Cell>
-        <TextField id="time" name="time" type="number" value={time} onChange={onChange} />
-      </Table.Cell>
-      <Table.Cell>
-        <TextField id="field" name="field" type="number" value={String(field)} onChange={onChange} />
-      </Table.Cell>
-      <Table.Cell>
-        <TextField id="color" name="color" value={color} onChange={onChange} />
-      </Table.Cell>
-    </Table.Row>
-  ), [id, homeTeam, awayTeam, time, field, color, division, onChange]);
+  return React.useMemo(
+    () => (
+      <Table.Row>
+        <Table.Cell>{id}</Table.Cell>
+        <Table.Cell>{division}</Table.Cell>
+        <Table.Cell width="five">
+          <Input
+            name="home"
+            value={homeTeam.data.name}
+            onChange={(e, { value }) => homeTeam.update({ name: value })}
+          />
+        </Table.Cell>
+        <Table.Cell width="five">
+          <Input
+            value={awayTeam.data.name}
+            onChange={(e, { value }) => awayTeam.update({ name: value })}
+          />
+        </Table.Cell>
+        <Table.Cell>
+          <Input name="time" type="number" value={time} onChange={onChange} />
+        </Table.Cell>
+        <Table.Cell>
+          <Input name="field" type="number" value={field} onChange={onChange} />
+        </Table.Cell>
+        <Table.Cell>
+          <Input name="color" value={color} onChange={onChange} />
+        </Table.Cell>
+      </Table.Row>
+    ),
+    [id, homeTeam, awayTeam, time, field, color, division, onChange]
+  );
 });
 
 export default () => {
-  const [games, setGames] = useState([]);
-  useEffect(() => {
+  const [games, setGames] = React.useState([]);
+  React.useEffect(() => {
     fire
       .database()
       .ref("games")

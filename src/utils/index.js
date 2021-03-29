@@ -1,6 +1,6 @@
 const getPoints = (a) => a.wins * 2 + a.ties;
 const getDifferential = (team) => team.pf - team.pa;
-const compare = (a, b) => {
+const compare = (a,b) => {
   if (a > b) return -1;
   else if (b > a) return 1;
   else return 0;
@@ -29,12 +29,12 @@ export const rankTeams = (a, b) => {
   return 0;
 }
 
-export const handleFocus = ({ event }) => {
-  event.target.select();
+export const handleFocus = ({target}) =>  {
+  target.select();
 }
 
-export const groupBy = function (xs, key) {
-  return xs ? xs.reduce(function (rv, x) {
+export const groupBy = function(xs, key) {
+  return xs ? xs.reduce(function(rv, x) {
     (rv[x[key]] = rv[x[key]] || []).push(x);
     return rv;
   }, {}) : {};
@@ -43,7 +43,7 @@ export const groupBy = function (xs, key) {
 export const resetScore = (id, teams) => {
   return {
     ...teams,
-    [id]: { ...SCORE_DEFAULTS }
+    [id]: {...SCORE_DEFAULTS}
   }
 }
 
@@ -61,7 +61,7 @@ export const determineWinner = game => {
       loser: 'home'
     }
   }
-  return { ...game }
+  return {...game}
 }
 
 export const determineOutcomes = (game, teams) => {

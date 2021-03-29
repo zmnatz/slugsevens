@@ -1,43 +1,72 @@
-import React, { useMemo, memo } from "react";
-import { Row, Heading } from 'gestalt'
+import React, { useMemo, useState } from "react";
+import { Segment, Button, Table } from "semantic-ui-react";
 
 import Game from "./Game";
 
 import { groupBy } from "../utils/";
-import useQuery from "hooks/useQuery";
+import ResultContext from "../state/results";
+import useQuery from "../hooks/useQuery";
 
-const TimeSlot = ({ games }) => {
-  const hours = games[0].time.substring(0, 2);
-  const minutes = games[0].time.substring(2, 4);
+export default _ => {
+  const { games } = React.useContext(ResultContext);
+  const [selected, setSelected] = useState();
+  const divisions = useQuery("divisions");
 
-  const sortedGames = useMemo(() => {
-    const sorted = [...games];
-    sorted.sort((a, b) => a.field - b.field);
-    return sorted;
-  }, [games]);
-
-  return <Row alignItems="start" gap={2}>
-    <Heading size="sm">{hours}:{minutes}</Heading>
-    <Row key={hours + minutes + 'names'} wrap gap={1} alignItems='start'>
-      {sortedGames.map(({ id, complete }) => (
-        <Game key={id + complete} id={id} />
-      ))}
-    </Row>
-  </Row>
-}
-
-export default memo(_ => {
-  const games = useQuery('games')
+  const filteredGames = useMemo(
+    () =>
+      games.filter(
+        game => game != null && (selected == null || game.division === selected)
+      ),
+    [games, selected]
+  );
 
   const processedGroups = useMemo(() => {
-    const g = groupBy(games, "time");
+    const g = groupBy(filteredGames, "time");
     const times = Object.keys(g);
     times.sort((a, b) => Number(a) - Number(b));
-
     return times.map(time => g[time]);
-  }, [games]);
+  }, [filteredGames]);
 
-    return processedGroups.map((groupedGames, index) => (
-      <TimeSlot key={index} games={groupedGames} />
-    ));
-});
+  const scores = useMemo(
+    () =>
+      Object.values(processedGroups).map(groupedGames => {
+        groupedGames.sort((a, b) => a.field - b.field);
+        return (
+          <Table.Row key={groupedGames[0].time} verticalAlign="top">
+            <Table.Cell>
+              {groupedGames[0].time.substring(0, 2)}:
+              {groupedGames[0].time.substring(2, 4)}
+            </Table.Cell>
+            {groupedGames.map(({ id }) => (
+              <Game key={id} id={id} />
+            ))}
+          </Table.Row>
+        );
+      }),
+    [processedGroups]
+  );
+
+  return useMemo(
+    () => (
+      <React.Fragment>
+        <Segment basic>
+          {divisions.map(division => (
+            <Button
+              key={division}
+              positive={selected === division}
+              onClick={() =>
+                setSelected(division === selected ? null : division)
+              }
+            >
+              {division}
+            </Button>
+          ))}
+        </Segment>
+        <Table>
+          <Table.Body>{scores}</Table.Body>
+        </Table>
+      </React.Fragment>
+    ),
+    [scores, selected, divisions]
+  );
+};
