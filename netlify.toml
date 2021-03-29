@@ -1,5 +1,5 @@
 [build]
-  Command = "yarn build"
+  Command = "npm build"
   Publish = "build"
 [[redirects]]
   from = "/*"
