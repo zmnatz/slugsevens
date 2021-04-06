@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import { Router } from "@reach/router";
 import "semantic-ui-css/semantic.min.css";
 import View from "./components/View";
@@ -8,7 +8,7 @@ import { ResultProvider } from "./state/results";
 import GameList from "./components/GameList";
 import TeamManager from "./components/TeamManager";
 
-const App = memo(() => {
+const App = () => {
   return (
     <PermissionProvider>
       <ResultProvider>
@@ -21,6 +21,6 @@ const App = memo(() => {
       </ResultProvider>
     </PermissionProvider>
   );
-});
+};
 
 export default App;
