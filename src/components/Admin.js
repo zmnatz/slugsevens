@@ -1,15 +1,18 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from "react";
 
-import Permissions from '../state/permissions'
-import Generator from './Generator';
-import Menu from './Menu'
+import Permissions from "../state/permissions";
+import Generator from "./Generator";
+import Menu from "./Menu";
 
-export default () => {
-  const {master, setAdmin} = useContext(Permissions)
-  useEffect(_ => setAdmin(true), [setAdmin]);
+const Admin = () => {
+  const { master, setAdmin } = useContext(Permissions);
+  useEffect((_) => setAdmin(true), [setAdmin]);
 
-  return <React.Fragment>
-    <Menu/>
-    {master && <Generator />}
-  </React.Fragment>
-}
+  return (
+    <React.Fragment>
+      <Menu />
+      {master && <Generator />}
+    </React.Fragment>
+  );
+};
+export default Admin;

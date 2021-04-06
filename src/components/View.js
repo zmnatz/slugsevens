@@ -15,13 +15,13 @@ const schedule = {
   render: () => <Schedule />
 };
 
-export default () => {
+const View = () => {
   const divisions = useQuery("divisions");
   const { teams } = useContext(ResultContext);
   const groupedTeams = useMemo(() => groupBy(teams, "division"), [teams]);
   const panes = useMemo(
     () =>
-      divisions.map(division => ({
+      divisions.map((division) => ({
         menuItem: division,
         render: () => (
           <Tab.Pane>
@@ -45,3 +45,4 @@ export default () => {
     [panes]
   );
 };
+export default View;

@@ -23,7 +23,7 @@ const RegistrationRow = ({ id }) => {
   );
 };
 
-export default _ => {
+const Registrations = (_) => {
   const teams = useQuery("registration");
 
   return useMemo(
@@ -45,3 +45,4 @@ export default _ => {
     [teams]
   );
 };
+export default Registrations;

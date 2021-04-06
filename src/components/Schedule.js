@@ -7,7 +7,7 @@ import { groupBy } from "../utils/";
 import ResultContext from "../state/results";
 import useQuery from "../hooks/useQuery";
 
-export default _ => {
+const Schedule = (_) => {
   const { games } = React.useContext(ResultContext);
   const [selected, setSelected] = useState();
   const divisions = useQuery("divisions");
@@ -15,7 +15,8 @@ export default _ => {
   const filteredGames = useMemo(
     () =>
       games.filter(
-        game => game != null && (selected == null || game.division === selected)
+        (game) =>
+          game != null && (selected == null || game.division === selected)
       ),
     [games, selected]
   );
@@ -24,12 +25,12 @@ export default _ => {
     const g = groupBy(filteredGames, "time");
     const times = Object.keys(g);
     times.sort((a, b) => Number(a) - Number(b));
-    return times.map(time => g[time]);
+    return times.map((time) => g[time]);
   }, [filteredGames]);
 
   const scores = useMemo(
     () =>
-      Object.values(processedGroups).map(groupedGames => {
+      Object.values(processedGroups).map((groupedGames) => {
         groupedGames.sort((a, b) => a.field - b.field);
         return (
           <Table.Row key={groupedGames[0].time} verticalAlign="top">
@@ -50,7 +51,7 @@ export default _ => {
     () => (
       <React.Fragment>
         <Segment basic>
-          {divisions.map(division => (
+          {divisions.map((division) => (
             <Button
               key={division}
               positive={selected === division}
@@ -70,3 +71,4 @@ export default _ => {
     [scores, selected, divisions]
   );
 };
+export default Schedule;

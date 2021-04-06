@@ -8,7 +8,7 @@ import Permissions from "../state/permissions";
 
 const FIELDS = ["Upper", "Middle", "Lower"];
 
-export default props => {
+const Game = (props) => {
   const game = useFirebase(`games/${props.id}`, null);
   const { master, admin } = useContext(Permissions);
 
@@ -161,3 +161,4 @@ export default props => {
     </Table.Cell>
   );
 };
+export default Game;

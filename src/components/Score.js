@@ -9,7 +9,7 @@ const Score = ({ score }) => (
   </List.Icon>
 );
 
-export default ({ game }) => {
+const ScoreCard = ({ game }) => {
   const { score = {} } = game;
 
   return (
@@ -28,3 +28,4 @@ export default ({ game }) => {
     </List>
   );
 };
+export default ScoreCard;

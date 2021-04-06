@@ -3,7 +3,7 @@ import { Form } from "semantic-ui-react";
 import { handleFocus } from "../utils";
 import useFirebase from "../hooks/useFirebase";
 
-export default () => {
+const ScheduleSettings = () => {
   const settings = useFirebase("settings");
 
   const onChange = useCallback(
@@ -56,3 +56,4 @@ export default () => {
     );
   }, [settings, onChange]);
 };
+export default ScheduleSettings;

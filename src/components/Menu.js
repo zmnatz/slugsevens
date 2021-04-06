@@ -11,7 +11,7 @@ function signOut() {
   firebase.auth().signOut();
 }
 
-export default () => {
+const Menu = () => {
   const { user } = useContext(Permissions);
 
   return (
@@ -26,3 +26,4 @@ export default () => {
     </Menu>
   );
 };
+export default Menu;

@@ -2,14 +2,14 @@ import React, { useMemo } from "react";
 import { Menu, Sidebar } from "semantic-ui-react";
 import useQuery from "../hooks/useQuery";
 
-export default ({ visible, onSelect }) => {
+const TeamList = ({ visible, onSelect }) => {
   const teams = useQuery("teams");
   const sortedTeams = useMemo(() => {
     const sorted = [...teams];
     sorted.sort(({ name = "" }, { name: other = "" }) =>
       name.localeCompare(other)
     );
-    return sorted.map(team => (
+    return sorted.map((team) => (
       <Menu.Item
         key={team.id}
         as="a"
@@ -31,3 +31,4 @@ export default ({ visible, onSelect }) => {
     [sortedTeams, visible, onSelect]
   );
 };
+export default TeamList;

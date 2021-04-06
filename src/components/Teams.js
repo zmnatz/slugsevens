@@ -6,8 +6,8 @@ import AddTeam from "./AddTeam";
 import Permissions from "../state/permissions";
 import { rankTeams, groupBy } from "../utils";
 
-const List = ({ teams=[] }) => {
-  return Object.entries(groupBy(teams, "pool")).map(entry => (
+const List = ({ teams = [] }) => {
+  return Object.entries(groupBy(teams, "pool")).map((entry) => (
     <div key={entry[0]}>
       <h4>Pool {entry[0]}</h4>
       <Grid celled columns="equal">
@@ -19,7 +19,7 @@ const List = ({ teams=[] }) => {
           <Grid.Column>PF</Grid.Column>
           <Grid.Column>PA</Grid.Column>
         </Grid.Row>
-        {entry[1].sort(rankTeams).map(team => (
+        {entry[1].sort(rankTeams).map((team) => (
           <Team key={team.id} team={team} />
         ))}
       </Grid>
@@ -27,7 +27,7 @@ const List = ({ teams=[] }) => {
   ));
 };
 
-export default ({ teams, division }) => {
+const Teams = ({ teams, division }) => {
   const { master } = useContext(Permissions);
   return (
     <div>
@@ -37,3 +37,4 @@ export default ({ teams, division }) => {
     </div>
   );
 };
+export default Teams;

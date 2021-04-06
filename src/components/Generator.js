@@ -33,7 +33,7 @@ const generateRound = (divisions, teams) => {
     i++;
   } while (schedule.length > gameCount);
 
-  return schedule.map(game => ({
+  return schedule.map((game) => ({
     home: game[0],
     away: game[1],
     division: game[0].division
@@ -41,17 +41,51 @@ const generateRound = (divisions, teams) => {
 };
 
 function generatePlayoffs(divisions) {
-  const schedule = [[],[]]
+  const schedule = [[], []];
   const playoffs = divisions.reduce((schedule, division) => {
-    schedule[0] = [...schedule[0], 
-      {division, color: 'green', name: 'Semifinal', home: {name: '#1 Pool A'}, away: {name: '#2 Pool B'}},
-      {division, color: 'green', name: 'Semifinal', home: {name: '#1 Pool B'}, away: {name: '#1 Pool B'}},
-      {division, color: 'green', name: '5th Place', home: {name: '#3 Pool A'}, away: {name: '#3 Pool B'}},
-      {division, color: 'green', name: '7th Place', home: {name: '#4 Pool A'}, away: {name: '#4 Pool B'}}, 
-    ]
-    schedule[1] = [...schedule[1], {division, color: 'blue', name: 'Championship', home: {name: 'Finalist 1'}, away: {name: 'Finalist 2'}}]
+    schedule[0] = [
+      ...schedule[0],
+      {
+        division,
+        color: "green",
+        name: "Semifinal",
+        home: { name: "#1 Pool A" },
+        away: { name: "#2 Pool B" }
+      },
+      {
+        division,
+        color: "green",
+        name: "Semifinal",
+        home: { name: "#1 Pool B" },
+        away: { name: "#1 Pool B" }
+      },
+      {
+        division,
+        color: "green",
+        name: "5th Place",
+        home: { name: "#3 Pool A" },
+        away: { name: "#3 Pool B" }
+      },
+      {
+        division,
+        color: "green",
+        name: "7th Place",
+        home: { name: "#4 Pool A" },
+        away: { name: "#4 Pool B" }
+      }
+    ];
+    schedule[1] = [
+      ...schedule[1],
+      {
+        division,
+        color: "blue",
+        name: "Championship",
+        home: { name: "Finalist 1" },
+        away: { name: "Finalist 2" }
+      }
+    ];
     return schedule;
-  }, schedule)
+  }, schedule);
   return [...playoffs[0], ...playoffs[1]];
 }
 
@@ -88,10 +122,10 @@ function setLocation(games, settings) {
 
 function resetSchedule(games) {
   const db = fire.database().ref("games");
-  db.remove().then(() => games.forEach(game => db.push(game)));
+  db.remove().then(() => games.forEach((game) => db.push(game)));
 }
 
-export default () => {
+const Generator = () => {
   const { data: settings } = useFirebase("settings");
   const divisions = useQuery("divisions");
   const { teams } = React.useContext(ResultContext);
@@ -104,7 +138,7 @@ export default () => {
       ...generatePlayoffs(divisions)
     ];
     const scheduledGames = setLocation(games, settings);
-    const enrichedGames = scheduledGames.map(game => ({
+    const enrichedGames = scheduledGames.map((game) => ({
       ...game,
       score: {
         home: 0,
@@ -126,3 +160,4 @@ export default () => {
     [onGenerate]
   );
 };
+export default Generator;

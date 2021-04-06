@@ -48,15 +48,15 @@ const GameRow = React.memo(({ id }) => {
   );
 });
 
-export default () => {
+const GameList = () => {
   const [games, setGames] = React.useState([]);
   React.useEffect(() => {
     fire
       .database()
       .ref("games")
       .orderByChild("division")
-      .on("child_added", snapshot => {
-        setGames(prev => [...prev, { id: snapshot.key, ...snapshot.val() }]);
+      .on("child_added", (snapshot) => {
+        setGames((prev) => [...prev, { id: snapshot.key, ...snapshot.val() }]);
       });
   }, []);
 
@@ -83,3 +83,4 @@ export default () => {
     );
   }, [games]);
 };
+export default GameList;

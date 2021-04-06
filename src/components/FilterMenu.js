@@ -1,8 +1,7 @@
 import React from "react";
 import { Button } from "semantic-ui-react";
 import useFirebase from "../hooks/useFirebase";
-
-export default ({ filter, onToggle, visible, clearSelected }) => {
+const FilterMenu = ({ filter, onToggle, visible, clearSelected }) => {
   const { data: team } = useFirebase(`teams/${filter}`);
   return (
     <nav>
@@ -25,3 +24,5 @@ export default ({ filter, onToggle, visible, clearSelected }) => {
     </nav>
   );
 };
+
+export default FilterMenu;

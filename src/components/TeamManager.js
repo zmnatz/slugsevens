@@ -9,7 +9,7 @@ const TeamRow = React.memo(({ id, games, gameRef }) => {
   const onChange = React.useCallback(
     (e, { value }) => {
       team.update({ name: value });
-      games.forEach(game => {
+      games.forEach((game) => {
         if (game.home.id === id) {
           gameRef.ref(`games/${game.id}/home`).update({ name: value });
         } else if (game.away.id === id) {
@@ -30,7 +30,7 @@ const TeamRow = React.memo(({ id, games, gameRef }) => {
   );
 });
 
-export default () => {
+const TeamManager = () => {
   const teams = useQuery("teams");
   const games = useQuery("games");
   const gameRef = fire.database();
@@ -52,3 +52,4 @@ export default () => {
     </Table>
   );
 };
+export default TeamManager;
