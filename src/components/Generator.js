@@ -10,9 +10,12 @@ import useFirebase from "../hooks/useFirebase";
 import useQuery from "../hooks/useQuery";
 import ResultContext from "../state/results";
 
+const ROUNDS = 3;
+
 const checkRound = (i, schedule, round) => {
-  if (round[i]) {
-    schedule.push(...round[i]);
+  if (round[i % round.length]) {
+    console.log(round[i % round.length])
+    schedule.push(...round[i % round.length]);
   }
 };
 
@@ -25,13 +28,11 @@ const generateRound = (divisions, teams) => {
     return scheduled;
   }, {});
   const schedule = [];
-  let i = 0,
-    gameCount;
+  let i = 0;
   do {
-    gameCount = schedule.length;
     Object.values(schedules).forEach(checkRound.bind(this, i, schedule));
     i++;
-  } while (schedule.length > gameCount);
+  } while (i < ROUNDS);
 
   return schedule.map((game) => ({
     home: game[0],
@@ -56,7 +57,7 @@ function generatePlayoffs(divisions) {
         division,
         color: "green",
         name: "Semifinal",
-        home: { name: "#1 Pool B" },
+        home: { name: "#2 Pool A" },
         away: { name: "#1 Pool B" }
       },
       {

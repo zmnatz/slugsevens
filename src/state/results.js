@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useEffect} from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import fire from "../api/fire";
 
 import { SCORE_DEFAULTS, determineOutcomes, reverseOutcome, determineWinner } from "../utils";
@@ -11,13 +11,13 @@ const ResultContext = React.createContext({
   games: DEFAULT_GAMES
 })
 
-const ResultProvider = ({children}) => {
+const ResultProvider = ({ children }) => {
   const [teams, setTeams] = useState(DEFAULT_TEAMS);
   const [games, setGames] = useState(DEFAULT_GAMES);
 
   useEffect(() => {
     let teamsRef = fire.database().ref("teams").orderByKey();
-    teamsRef.on("child_added", snapshot => 
+    teamsRef.on("child_added", snapshot =>
       setTeams(prev => {
         const prevTeam = prev[snapshot.key] || SCORE_DEFAULTS;
         let team = {
@@ -26,7 +26,7 @@ const ResultProvider = ({children}) => {
           id: snapshot.key
         };
         return {
-          ...prev, 
+          ...prev,
           [team.id]: team
         };
       })
@@ -43,7 +43,7 @@ const ResultProvider = ({children}) => {
       teamsRef.off('child_removed')
     }
   }, [])
-  
+
   useEffect(() => {
     let gamesRef = fire.database().ref("games").orderByKey();
     gamesRef.on("child_added", snapshot => {
@@ -61,7 +61,7 @@ const ResultProvider = ({children}) => {
     gamesRef.on("child_removed", snapshot => {
       setGames(prev => ({
         ...prev,
-          [snapshot.key]: undefined
+        [snapshot.key]: undefined
       }));
     });
 
@@ -71,7 +71,7 @@ const ResultProvider = ({children}) => {
       let outcomeChanged;
       setGames(games => {
         outcomeChanged = !game.complete && games[game.id] && games[game.id].complete;
-        return {...games, [game.id]: game};
+        return { ...games, [game.id]: game };
       })
       if (game.complete) {
         setTeams(teams => determineOutcomes(game, teams));
@@ -90,12 +90,12 @@ const ResultProvider = ({children}) => {
   const filteredTeams = useMemo(() => Object.values(teams).filter(team => team), [teams]);
 
   return useMemo(() => (
-    <ResultContext.Provider value={{teams: filteredTeams, games: Object.values(games)}}>
+    <ResultContext.Provider value={{ teams: filteredTeams, games: Object.values(games) }}>
       {children}
-    </ResultContext.Provider> 
+    </ResultContext.Provider>
   ), [filteredTeams, games, children])
 }
 
 const ResultConsumer = ResultContext.Consumer
-export { ResultProvider,  ResultConsumer};
+export { ResultProvider, ResultConsumer };
 export default ResultContext;

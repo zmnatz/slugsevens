@@ -62,7 +62,7 @@ const Game = (props) => {
       <Card raised fluid>
         <Card.Content>
           {game.data.name && (
-            <Label color={game.data.color} attached="top">
+            <Label color={game.data.color} attached="bottom">
               {game.data.name}
             </Label>
           )}

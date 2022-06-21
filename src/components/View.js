@@ -7,8 +7,7 @@ import Teams from "./Teams";
 import useQuery from "../hooks/useQuery";
 import ResultContext from "../state/results";
 import { groupBy } from "../utils";
-import Admin from "./Admin";
-import { Router } from "@reach/router";
+import { Outlet } from "react-router";
 
 const schedule = {
   menuItem: "Schedule",
@@ -34,9 +33,7 @@ const View = () => {
   return useMemo(
     () => (
       <React.Fragment>
-        <Router>
-          <Admin path="admin/*" />
-        </Router>
+        <Outlet />
         <Segment>
           <Tab panes={[schedule, ...panes]} />
         </Segment>
