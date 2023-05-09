@@ -1,18 +1,20 @@
 import React, { useMemo, useState } from "react";
-import fire from "../api/fire";
+import { auth } from "../api/fire";
+import useFirebaseRef from "hooks/useFirebaseRef";
+import { get, set } from "firebase/database";
 
 const PermissionContext = React.createContext({
   admin: false,
-  master: false
+  master: false,
 });
 
 function initUser(userRef, user) {
-  return userRef.set({
+  return set(userRef, {
     email: user.email,
     displayName: user.displayName,
     roles: {
-      master: true
-    }
+      master: true,
+    },
   });
 }
 
@@ -20,15 +22,15 @@ const PermissionComponent = ({ children }) => {
   const [admin, setAdmin] = useState(false);
   const [master, setMaster] = useState(false);
   const [user, setUser] = useState();
+  const userRef = useFirebaseRef(`users/${user?.uid}`);
 
   React.useEffect(() => {
-    fire.auth().onAuthStateChanged(user => {
+    auth.onAuthStateChanged((user) => {
       setUser(user);
       if (user == null) {
         setMaster(false);
       } else {
-        const userRef = fire.database().ref(`users/${user.uid}`);
-        userRef.once("value", snapshot => {
+        get(userRef).then((snapshot) => {
           if (!snapshot.exists()) {
             initUser(userRef, user);
           } else if (snapshot.val().roles.master) {
@@ -37,7 +39,7 @@ const PermissionComponent = ({ children }) => {
         });
       }
     });
-  }, []);
+  }, [userRef]);
 
   return useMemo(
     () => (

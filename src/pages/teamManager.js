@@ -33,7 +33,6 @@ const TeamRow = React.memo(({ id, games, gameRef }) => {
 const TeamManager = () => {
   const teams = useQuery("teams");
   const games = useQuery("games");
-  const gameRef = fire.database();
 
   return (
     <Table columns={2} unstackable striped>
@@ -46,7 +45,7 @@ const TeamManager = () => {
       </Table.Header>
       <Table.Body>
         {teams.map(({ id }) => (
-          <TeamRow id={id} key={id} games={games} gameRef={gameRef} />
+          <TeamRow id={id} key={id} games={games} />
         ))}
       </Table.Body>
     </Table>

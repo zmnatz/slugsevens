@@ -1,14 +1,11 @@
 import React, { useContext } from "react";
+import { signOut } from "firebase/auth";
 import { Menu } from "semantic-ui-react";
-import firebase, { auth } from "../api/fire";
+import { signIn, auth } from "../api/fire";
 import Permissions from "../state/permissions";
 
-function signIn() {
-  firebase.auth().signInWithPopup(auth);
-}
-
-function signOut() {
-  firebase.auth().signOut();
+function signOutOfApp() {
+  signOut(auth);
 }
 
 const AppMenu = () => {
@@ -20,7 +17,7 @@ const AppMenu = () => {
         {user == null ? (
           <Menu.Item onClick={signIn}>Sign In</Menu.Item>
         ) : (
-          <Menu.Item onClick={signOut}>Sign Out</Menu.Item>
+          <Menu.Item onClick={signOutOfApp}>Sign Out</Menu.Item>
         )}
       </Menu.Menu>
     </Menu>

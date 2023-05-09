@@ -7,11 +7,10 @@ import Teams from "./Teams";
 import useQuery from "../hooks/useQuery";
 import ResultContext from "../state/results";
 import { groupBy } from "../utils";
-import { Outlet } from "react-router";
 
 const schedule = {
   menuItem: "Schedule",
-  render: () => <Schedule />
+  render: () => <Schedule />,
 };
 
 const View = () => {
@@ -26,18 +25,15 @@ const View = () => {
           <Tab.Pane>
             <Teams division={division} teams={groupedTeams[division]} />
           </Tab.Pane>
-        )
+        ),
       })),
     [divisions, groupedTeams]
   );
   return useMemo(
     () => (
-      <React.Fragment>
-        <Outlet />
-        <Segment>
-          <Tab panes={[schedule, ...panes]} />
-        </Segment>
-      </React.Fragment>
+      <Segment>
+        <Tab panes={[schedule, ...panes]} />
+      </Segment>
     ),
     [panes]
   );

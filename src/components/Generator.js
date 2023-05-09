@@ -9,12 +9,13 @@ import ScheduleSettings from "./ScheduleSettings";
 import useFirebase from "../hooks/useFirebase";
 import useQuery from "../hooks/useQuery";
 import ResultContext from "../state/results";
+import useFirebaseRef from "hooks/useFirebaseRef";
 
 const ROUNDS = 3;
 
 const checkRound = (i, schedule, round) => {
   if (round[i % round.length]) {
-    console.log(round[i % round.length])
+    console.log(round[i % round.length]);
     schedule.push(...round[i % round.length]);
   }
 };
@@ -37,7 +38,7 @@ const generateRound = (divisions, teams) => {
   return schedule.map((game) => ({
     home: game[0],
     away: game[1],
-    division: game[0].division
+    division: game[0].division,
   }));
 };
 
@@ -51,29 +52,29 @@ function generatePlayoffs(divisions) {
         color: "green",
         name: "Semifinal",
         home: { name: "#1 Pool A" },
-        away: { name: "#2 Pool B" }
+        away: { name: "#2 Pool B" },
       },
       {
         division,
         color: "green",
         name: "Semifinal",
         home: { name: "#2 Pool A" },
-        away: { name: "#1 Pool B" }
+        away: { name: "#1 Pool B" },
       },
       {
         division,
         color: "green",
         name: "5th Place",
         home: { name: "#3 Pool A" },
-        away: { name: "#3 Pool B" }
+        away: { name: "#3 Pool B" },
       },
       {
         division,
         color: "green",
         name: "7th Place",
         home: { name: "#4 Pool A" },
-        away: { name: "#4 Pool B" }
-      }
+        away: { name: "#4 Pool B" },
+      },
     ];
     schedule[1] = [
       ...schedule[1],
@@ -82,8 +83,8 @@ function generatePlayoffs(divisions) {
         color: "blue",
         name: "Championship",
         home: { name: "Finalist 1" },
-        away: { name: "Finalist 2" }
-      }
+        away: { name: "Finalist 2" },
+      },
     ];
     return schedule;
   }, schedule);
@@ -116,13 +117,13 @@ function setLocation(games, settings) {
     return {
       ...game,
       field: (index % numFields) + 1,
-      time
+      time,
     };
   });
 }
 
 function resetSchedule(games) {
-  const db = fire.database().ref("games");
+  const db = useFirebaseRef("games");
   db.remove().then(() => games.forEach((game) => db.push(game)));
 }
 
@@ -136,16 +137,16 @@ const Generator = () => {
   const onGenerate = useCallback(() => {
     const games = [
       ...generateRound(divisions, groupedTeams),
-      ...generatePlayoffs(divisions)
+      ...generatePlayoffs(divisions),
     ];
     const scheduledGames = setLocation(games, settings);
     const enrichedGames = scheduledGames.map((game) => ({
       ...game,
       score: {
         home: 0,
-        away: 0
+        away: 0,
       },
-      complete: false
+      complete: false,
     }));
     resetSchedule(enrichedGames);
   }, [settings, groupedTeams, divisions]);
