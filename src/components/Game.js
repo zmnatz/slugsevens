@@ -6,7 +6,7 @@ import { handleFocus } from "../utils";
 import useFirebase from "../hooks/useFirebase";
 import Permissions from "../state/permissions";
 
-const FIELDS = ["Upper", "Middle", "Lower"];
+const FIELDS = ["Middle", "Lower", "Upper"];
 
 const Game = (props) => {
   const game = useFirebase(`games/${props.id}`, null);
